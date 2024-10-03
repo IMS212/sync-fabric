@@ -24,8 +24,8 @@ crowdintranslate.crowdinProjectname = "sync-fabric"
 crowdintranslate.minecraftProjectName = "sync"
 crowdintranslate.verbose = true
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
+sourceCompatibility = JavaVersion.VERSION_21
+targetCompatibility = JavaVersion.VERSION_21
 
 String loaderDependencyVersion = project.loader_version.split(/\+/)[0]
 String minecraftDependencyVersion = project.minecraft_version.split(/[+ -]/)[0]
@@ -149,7 +149,7 @@ tasks.withType(JavaCompile).configureEach {
     // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
     // If Javadoc is generated, this must be specified in that task too.
     it.options.encoding = "UTF-8"
-    it.options.release.set(17)
+    it.options.release.set(21)
 }
 
 java {
