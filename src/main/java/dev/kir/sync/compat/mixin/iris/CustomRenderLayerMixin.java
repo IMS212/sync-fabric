@@ -2,7 +2,7 @@ package dev.kir.sync.compat.mixin.iris;
 
 import dev.kir.sync.client.render.CustomRenderLayer;
 import dev.kir.sync.compat.iris.IrisRenderLayer;
-import ladysnake.satin.api.managed.ManagedCoreShader;
+import org.ladysnake.satin.api.managed.ManagedCoreShader;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.render.RenderLayer;

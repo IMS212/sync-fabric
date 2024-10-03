@@ -17,8 +17,7 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "dev.kir.sync.Sync",
-      "dev.kir.sync.compat.requiem.RequiemCompat"
+      "dev.kir.sync.Sync"
     ],
     "client": [
       "dev.kir.sync.Sync"
@@ -28,7 +27,6 @@
     ],
     "cardinal-components-entity": [
       "dev.kir.sync.compat.origins.OriginsCompat",
-      "dev.kir.sync.compat.haema.HaemaCompat",
       "dev.kir.sync.compat.trinkets.TrinketsCompat"
     ]
   },
@@ -45,7 +43,7 @@
     }
   },
   "depends": {
-    "fabric": "*",
+    "fabric-api": "*",
     "fabricloader": "${fabric}",
     "satin": "*",
 
@@ -61,8 +59,6 @@
     "cloth-config": "${cloth_config}",
     "modmenu": "${modmenu}",
     "trinkets": "${trinkets}",
-    "origins": "${origins}",
-    "haema": "${haema}",
-    "requiem": "${requiem}"
+    "origins": "${origins}"
   }
 }
