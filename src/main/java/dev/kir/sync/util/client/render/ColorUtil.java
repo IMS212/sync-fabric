@@ -11,7 +11,7 @@ public final class ColorUtil {
     }
 
     public static int fromDyeColor(DyeColor color, float a) {
-        float[] rgb = color.getColorComponents();
+        float[] rgb = color.getEntityColor();
         return fromRGBA(rgb[0], rgb[1], rgb[2], a);
     }
 

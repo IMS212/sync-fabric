@@ -280,12 +280,12 @@ public abstract class AbstractShellContainerBlockEntity extends BlockEntity impl
         boolean isArmorSlot = slot >= 0 && slot < armorSize;
         if (isArmorSlot) {
             EquipmentSlot equipmentSlot = ItemUtil.getPreferredEquipmentSlot(stack);
-            return ItemUtil.isArmor(stack) && equipmentSlot.getType() == EquipmentSlot.Type.ARMOR && slot == equipmentSlot.getEntitySlotId();
+            return ItemUtil.isArmor(stack) && equipmentSlot.getType() == EquipmentSlot.Type.HUMANOID_ARMOR && slot == equipmentSlot.getEntitySlotId();
         }
 
         boolean isOffHandSlot = slot >= armorSize && slot < (armorSize + inventory.offHand.size());
         if (isOffHandSlot) {
-            return ItemUtil.getPreferredEquipmentSlot(stack) == EquipmentSlot.OFFHAND || inventory.main.stream().noneMatch(x -> x.isEmpty() || (x.getCount() + stack.getCount()) <= x.getMaxCount() && ItemStack.canCombine(x, stack));
+            return ItemUtil.getPreferredEquipmentSlot(stack) == EquipmentSlot.OFFHAND || inventory.main.stream().noneMatch(x -> x.isEmpty() || (x.getCount() + stack.getCount()) <= x.getMaxCount() && ItemStack.areItemsAndComponentsEqual(x, stack));
         }
 
         return true;

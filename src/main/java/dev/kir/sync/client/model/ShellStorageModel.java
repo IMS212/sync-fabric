@@ -152,7 +152,7 @@ public class ShellStorageModel extends AbstractShellContainerModel {
         this.headConnector.pivotZ = 10 - 5 * this.connectorProgress;
         super.render(type, matrices, vertices, light, overlay, red, green, blue, alpha);
         if (type == BOTTOM) {
-            float[] rgb = this.ledColor.getColorComponents();
+            float[] rgb = this.ledColor.getEntityColor();
             this.ledLight.render(matrices, vertices, light, overlay, rgb[0], rgb[1], rgb[2], 1F);
         }
     }

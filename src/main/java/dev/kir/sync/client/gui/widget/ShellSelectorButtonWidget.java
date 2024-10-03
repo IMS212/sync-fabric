@@ -158,11 +158,11 @@ public class ShellSelectorButtonWidget extends AbstractWidget {
         float alpha = this.isPressed() ? this.pressedAlpha : this.isHovered() ? this.hoveredAlpha : this.alpha;
         DyeColor borderColor = this.shell == null ? null : this.shell.getColor();
         DyeColor color = borderColor != null && (this.isHovered() || this.isPressed()) ? borderColor : this.color;
-        float[] rgb = color.getColorComponents();
+        float[] rgb = color.getEntityColor();
         RenderSystemUtil.drawAnnulusSector(matrices, this.cX, this.cY, this.majorR, this.minorR, this.from, this.to, this.step, rgb[0], rgb[1], rgb[2], alpha);
 
         if (borderColor != null) {
-            rgb = borderColor.getColorComponents();
+            rgb = borderColor.getEntityColor();
             RenderSystemUtil.drawAnnulusSector(matrices, this.cX, this.cY, this.majorR, this.minorRBorder, this.from, this.to, this.step, rgb[0], rgb[1], rgb[2], 1F);
         }
     }
