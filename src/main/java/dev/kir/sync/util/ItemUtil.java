@@ -45,7 +45,15 @@ public final class ItemUtil {
 
 
     public static EquipmentSlot getPreferredEquipmentSlot(ItemStack itemStack) {
-        return MobEntity.getPreferredEquipmentSlot(itemStack);
+        Equipment equipment = Equipment.fromStack(itemStack);
+        if (equipment != null) {
+            EquipmentSlot slot = equipment.getSlotType();
+            if (slot != EquipmentSlot.BODY) {
+                return slot;
+            }
+        }
+
+        return EquipmentSlot.MAINHAND;
     }
 
     public static EquipmentSlot getPreferredEquipmentSlot(ItemConvertible item) {
