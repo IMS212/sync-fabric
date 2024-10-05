@@ -8,6 +8,7 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.BuiltinRegistries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Nameable;
 import net.minecraft.util.collection.DefaultedList;
@@ -141,7 +142,9 @@ public class SimpleInventory implements Inventory, Nameable {
         for(int i = 0; i < nbtList.size(); ++i) {
             NbtCompound nbtCompound = nbtList.getCompound(i);
             int j = nbtCompound.getByte("Slot") & 255;
-            ItemStack itemStack = ItemStack.fromNbt(nbtCompound);
+            // TODO WARN Potentially jank
+            var lookup = BuiltinRegistries.createWrapperLookup();
+            ItemStack itemStack = ItemStack.fromNbtOrEmpty(lookup, nbtCompound);
             if (!itemStack.isEmpty()) {
                 if (j < this.main.size()) {
                     this.main.set(j, itemStack);
