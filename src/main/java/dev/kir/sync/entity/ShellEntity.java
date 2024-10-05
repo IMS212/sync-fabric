@@ -67,10 +67,6 @@ public class ShellEntity extends OtherClientPlayerEntity {
     }
 
     @Override
-    protected void dropXp() {
-    }
-
-    @Override
     public boolean isCreative() {
         return true;
     }

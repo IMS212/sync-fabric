@@ -19,6 +19,7 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -253,15 +254,15 @@ public class TreadmillBlockEntity extends BlockEntity implements DoubleBlockEnti
     }
 
     @Override
-    public NbtCompound toInitialChunkDataNbt() {
-        NbtCompound nbt = super.toInitialChunkDataNbt();
+    public NbtCompound toInitialChunkDataNbt(RegistryWrapper.WrapperLookup lookup) {
+        NbtCompound nbt = super.toInitialChunkDataNbt(lookup);
         this.writeNbt(nbt);
         return nbt;
     }
 
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
+    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        super.readNbt(nbt, lookup);
         this.runnerUUID = nbt.containsUuid("runner") ? nbt.getUuid("runner") : null;
         this.runnerId = nbt.contains("runnerId", NbtElement.INT_TYPE) ? nbt.getInt("runnerId") : -1;
         this.producibleEnergyQuantity = nbt.getLong("energy");
@@ -269,8 +270,8 @@ public class TreadmillBlockEntity extends BlockEntity implements DoubleBlockEnti
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        super.writeNbt(nbt, lookup);
         UUID runnerUuid = this.runnerUUID == null ? this.runner == null ? null : this.runner.getUuid() : this.runnerUUID;
         if (runnerUuid != null) {
             nbt.putUuid("runner", runnerUuid);
