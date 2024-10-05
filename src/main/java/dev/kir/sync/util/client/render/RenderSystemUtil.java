@@ -94,8 +94,7 @@ public final class RenderSystemUtil {
         RenderSystem.defaultBlendFunc();
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 
-        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-        bufferBuilder.begin(drawMode, format);
+        BufferBuilder bufferBuilder = Tessellator.getInstance().begin(drawMode, format);
         consumer.accept(bufferBuilder);
         BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 
