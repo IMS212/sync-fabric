@@ -8,6 +8,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
+import net.minecraft.client.util.BufferAllocator;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.RotationAxis;
@@ -122,7 +123,8 @@ public final class RenderSystemUtil {
     }
 
     public static void drawCenteredText(DrawContext drawContext, Text text, TextRenderer textRenderer, float cX, float cY, float scale, int color, boolean shadow) {
-        VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
+        //TODO verify if this actually works
+        VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(new BufferAllocator(text.toString().length()));
         drawCenteredText(drawContext, text, immediate, textRenderer, cX, cY, scale, color, shadow);
         immediate.draw();
     }
