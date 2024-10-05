@@ -77,31 +77,27 @@ public abstract class DoubleBlockModel extends Model {
         return template;
     }
 
-    public void render(MatrixStack matrices, VertexConsumer vertices, int light, int overlay) {
-        this.render(matrices, vertices, light, overlay, 1F, 1F, 1F, 1F);
-    }
-
     @Override
-    public void render(MatrixStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {
+    public void render(MatrixStack matrices, VertexConsumer vertices, int light, int overlay, int color) {
         matrices.push();
-        this.render(DoubleBlockProperties.Type.FIRST, matrices, vertices, light, overlay, red, green, blue, alpha);
+        this.render(DoubleBlockProperties.Type.FIRST, matrices, vertices, light, overlay, color);
         this.translate(matrices);
-        this.render(DoubleBlockProperties.Type.SECOND, matrices, vertices, light, overlay, red, green, blue, alpha);
+        this.render(DoubleBlockProperties.Type.SECOND, matrices, vertices, light, overlay, color);
         matrices.pop();
     }
 
     public void render(DoubleBlockProperties.Type type, MatrixStack matrices, VertexConsumer vertices, int light, int overlay) {
-        this.render(type, matrices, vertices, light, overlay, 1F, 1F, 1F, 1F);
+        this.render(type, matrices, vertices, light, overlay, 0xFFFFFFFF);
     }
 
-    public void render(DoubleBlockProperties.Type type, MatrixStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {
+    public void render(DoubleBlockProperties.Type type, MatrixStack matrices, VertexConsumer vertices, int light, int overlay, int color) {
         List<ModelPart> currentParts = this.parts.get(type);
         if (currentParts == null) {
             return;
         }
 
         for (ModelPart part : currentParts) {
-            part.render(matrices, vertices, light, overlay, red, green, blue, alpha);
+            part.render(matrices, vertices, light, overlay, color);
         }
     }
 

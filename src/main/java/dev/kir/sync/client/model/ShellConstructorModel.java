@@ -101,8 +101,8 @@ public class ShellConstructorModel extends AbstractShellContainerModel {
     }
 
     @Override
-    public void render(DoubleBlockProperties.Type type, MatrixStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {
-        super.render(type, matrices, vertices, light, overlay, red, green, blue, alpha);
+    public void render(DoubleBlockProperties.Type type, MatrixStack matrices, VertexConsumer vertices, int light, int overlay, int color) {
+        super.render(type, matrices, vertices, light, overlay, color);
         if (type != BOTTOM || !this.showInnerParts) {
             return;
         }

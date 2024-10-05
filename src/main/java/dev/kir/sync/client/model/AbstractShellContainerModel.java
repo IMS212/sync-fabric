@@ -32,7 +32,7 @@ public abstract class AbstractShellContainerModel extends DoubleBlockModel {
     }
 
     @Override
-    public void render(DoubleBlockProperties.Type type, MatrixStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {
+    public void render(DoubleBlockProperties.Type type, MatrixStack matrices, VertexConsumer vertices, int light, int overlay, int color) {
         this.doorLL.yaw = this.doorLU.yaw = Radians.R_PI_2 * this.doorOpenProgress;
         this.doorRL.yaw = this.doorRU.yaw = Radians.R_PI - Radians.R_PI_2 * this.doorOpenProgress;
 
@@ -40,7 +40,7 @@ public abstract class AbstractShellContainerModel extends DoubleBlockModel {
         this.doorRL.pivotZ = this.doorRU.pivotZ = -14 + 14 * this.doorOpenProgress;
         this.doorRL.pivotX = this.doorRU.pivotX = 15 - this.doorOpenProgress;
 
-        super.render(type, matrices, vertices, light, overlay, red, green, blue, alpha);
+        super.render(type, matrices, vertices, light, overlay, color);
     }
 
     @Override
