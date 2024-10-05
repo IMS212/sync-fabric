@@ -104,7 +104,7 @@ class OriginsShellStateComponent extends ShellStateComponent {
     }
 
     @Override
-    protected NbtCompound writeComponentNbt(NbtCompound nbt) {
+    protected NbtCompound writeComponentNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         nbt.put("origins", this.getOriginComponentNbt());
         nbt.put("powers", this.getPowerHolderComponentNbt());
         nbt.putBoolean("activated", this.isActivated());

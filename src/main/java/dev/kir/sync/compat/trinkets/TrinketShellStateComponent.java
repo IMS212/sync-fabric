@@ -87,7 +87,7 @@ class TrinketShellStateComponent extends ShellStateComponent {
     }
 
     @Override
-    public NbtCompound writeComponentNbt(NbtCompound nbt) {
+    public NbtCompound writeComponentNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         for (Map.Entry<String, Map<String, Inventory>> group : this.inventory.entrySet()) {
             NbtCompound groupTag = new NbtCompound();
             for (Map.Entry<String, Inventory> slot : group.getValue().entrySet()) {

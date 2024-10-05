@@ -57,7 +57,7 @@ public abstract class CCAShellStateComponent extends ShellStateComponent {
     }
 
     @Override
-    protected NbtCompound writeComponentNbt(NbtCompound nbt) {
-        return nbt.copyFrom(this.getComponentNbt());
+    protected NbtCompound writeComponentNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        return nbt.copyFrom(this.getComponentNbt(lookup));
     }
 }
