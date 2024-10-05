@@ -245,7 +245,7 @@ public abstract class ShellStateComponent {
         @Override
         public NbtCompound writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
             for (ShellStateComponent component : this.components) {
-                component.writeNbt(nbt);
+                component.writeNbt(nbt, lookup);
             }
             return nbt;
         }
