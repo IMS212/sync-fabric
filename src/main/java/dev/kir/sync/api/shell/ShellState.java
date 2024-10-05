@@ -14,6 +14,7 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.BuiltinRegistries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -343,7 +344,11 @@ public class ShellState {
             .add(Float.class, "health", x -> x.health, (x, health) -> x.health = health)
             .add(Integer.class, "gameMode", x -> x.gameMode, (x, gameMode) -> x.gameMode = gameMode)
             .add(NbtList.class, "inventory", x -> x.inventory.writeNbt(new NbtList()), (x, inventory) -> { x.inventory = new SimpleInventory(); x.inventory.readNbt(inventory); })
-            .add(NbtCompound.class, "components", x -> x.component.writeNbt(new NbtCompound()), (x, component) -> { x.component = ShellStateComponent.empty(); if (component != null) { x.component.readNbt(component); } })
+            .add(NbtCompound.class, "components", x -> {
+                // TODO WARN maybe jank
+                RegistryWrapper.WrapperLookup wrapperLookup = BuiltinRegistries.createWrapperLookup();
+                return x.component.writeNbt(new NbtCompound(), wrapperLookup);
+            }, (x, component) -> { x.component = ShellStateComponent.empty(); if (component != null) { x.component.readNbt(component); } })
 
             .add(Integer.class, "foodLevel", x -> x.foodLevel, (x, foodLevel) -> x.foodLevel = foodLevel)
             .add(Float.class, "saturationLevel", x -> x.saturationLevel, (x, saturationLevel) -> x.saturationLevel = saturationLevel)
