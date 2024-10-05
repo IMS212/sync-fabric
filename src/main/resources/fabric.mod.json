@@ -48,7 +48,7 @@
     "satin": "*",
 
     "minecraft": "${minecraft}",
-    "java": ">=16"
+    "java": ">=21"
   },
   "includes": {
     "smart-recipes": "${smart_recipes}",
