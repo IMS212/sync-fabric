@@ -10,7 +10,7 @@
     "technoblade.ClientWorldMixin",
     "technoblade.PigEntityMixin",
     "technoblade.MobEntityMixin",
-    "technoblade.MobEntityRendererMixin",
+    "technoblade.EntityRendererMixin",
     "technoblade.EntityRenderDispatcherMixin"
   ],
   "injectors": {
