@@ -77,7 +77,7 @@ class OriginsShellStateComponent extends ShellStateComponent {
 
         OriginComponent originComponent = ModComponents.ORIGIN.get(this.player);
         if (this.activated) {
-            originComponent.readFromNbt(this.originComponentNbt);
+            originComponent.readFromNbt(this.originComponentNbt, lookup);
             PowerHolderComponent powerHolderComponent = PowerHolderComponent.KEY.get(this.player);
             powerHolderComponent.readFromNbt(this.powerHolderComponentNbt);
             originComponent.sync();

@@ -185,8 +185,8 @@ public class ShellState {
      * @param pos Position of the shell.
      * @return Shell that is a full copy of the specified player.
      */
-    public static ShellState of(ServerPlayerEntity player, BlockPos pos) {
-        return of(player, pos, null);
+    public static ShellState of(ServerPlayerEntity player, BlockPos pos, RegistryWrapper.WrapperLookup lookup) {
+        return of(player, pos, null, lookup);
     }
 
     /**
