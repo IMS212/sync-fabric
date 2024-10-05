@@ -172,10 +172,10 @@ public abstract class AbstractShellContainerBlock extends BlockWithEntity {
         return super.onUseWithItem(stack, state, world, pos, player, hand, hit);
     }
 
-    @Override
-    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
+    /*@Override // TODO: Make sure all blockstates of this have this set
+    public boolean canPathfindThrough(NavigationType type) {
         return false;
-    }
+    }*/
 
     @Override
     public boolean hasComparatorOutput(BlockState state) {

@@ -145,10 +145,10 @@ public class TreadmillBlock extends HorizontalFacingBlock implements BlockEntity
         return super.onBreak(world, pos, state, player);
     }
 
-    @Override
-    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
+    /*@Override // TODO: Make sure all blockstates of this have this set
+    public boolean canPathfindThrough(NavigationType type) {
         return true;
-    }
+    }*/
 
     @Override
     public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
