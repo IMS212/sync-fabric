@@ -73,7 +73,7 @@ public class ShellConstructorBlockEntity extends AbstractShellContainerBlockEnti
             }
 
             player.damage(world.getDamageSources().sweetBerryBush(), damage);
-            this.shell = ShellState.empty(serverPlayer, pos);
+            this.shell = ShellState.empty(serverPlayer, pos, serverPlayer.getServerWorld().getRegistryManager());
             if (isCreative && config.enableInstantShellConstruction()) {
                 this.shell.setProgress(ShellState.PROGRESS_DONE);
             }
