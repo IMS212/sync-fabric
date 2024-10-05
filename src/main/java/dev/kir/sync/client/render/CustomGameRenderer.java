@@ -1,10 +1,10 @@
 package dev.kir.sync.client.render;
 
 import dev.kir.sync.Sync;
-import ladysnake.satin.api.managed.ManagedCoreShader;
-import ladysnake.satin.api.managed.ShaderEffectManager;
-import ladysnake.satin.api.managed.uniform.Uniform1f;
-import ladysnake.satin.api.managed.uniform.UniformMat4;
+import org.ladysnake.satin.api.managed.ManagedCoreShader;
+import org.ladysnake.satin.api.managed.ShaderEffectManager;
+import org.ladysnake.satin.api.managed.uniform.Uniform1f;
+import org.ladysnake.satin.api.managed.uniform.UniformMat4;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;

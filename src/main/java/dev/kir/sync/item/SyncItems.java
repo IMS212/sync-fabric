@@ -2,7 +2,6 @@ package dev.kir.sync.item;
 
 import dev.kir.sync.Sync;
 import dev.kir.sync.block.SyncBlocks;
-import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.minecraft.block.Block;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -17,10 +16,10 @@ public final class SyncItems {
     public static final Item TREADMILL;
 
     static {
-        SYNC_CORE = register("sync_core", new FabricItemSettings().maxCount(16));
-        SHELL_STORAGE = register(SyncBlocks.SHELL_STORAGE, new FabricItemSettings().maxCount(1));
-        SHELL_CONSTRUCTOR = register(SyncBlocks.SHELL_CONSTRUCTOR, new FabricItemSettings().maxCount(1));
-        TREADMILL = register(SyncBlocks.TREADMILL, new FabricItemSettings().maxCount(1));
+        SYNC_CORE = register("sync_core", new Item.Settings().maxCount(16));
+        SHELL_STORAGE = register(SyncBlocks.SHELL_STORAGE, new Item.Settings().maxCount(1));
+        SHELL_CONSTRUCTOR = register(SyncBlocks.SHELL_CONSTRUCTOR, new Item.Settings().maxCount(1));
+        TREADMILL = register(SyncBlocks.TREADMILL, new Item.Settings().maxCount(1));
     }
 
     public static void init() { }
