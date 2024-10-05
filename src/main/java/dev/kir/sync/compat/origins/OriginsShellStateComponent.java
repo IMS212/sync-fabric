@@ -85,16 +85,7 @@ class OriginsShellStateComponent extends ShellStateComponent {
             powerHolderComponent.readFromNbt(this.powerHolderComponentNbt);
             originComponent.sync();
         } else {
-            for (var layer : OriginLayerManager.entrySet()) {
-                if (layer.getValue().isEnabled()) {
-                    originComponent.setOrigin(layer.getValue(), Origin.EMPTY);
-                }
-            }
-            originComponent.checkAutoChoosingLayers(this.player, false);
-            originComponent.sync();
-            PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
-            data.writeBoolean(false);
-            ServerPlayNetworking.send(this.player, new OpenChooseOriginScreenS2CPacket(true));
+            ServerPlayNetworking.send(this.player, new OpenChooseOriginScreenS2CPacket(false));
             this.activated = true;
         }
     }
