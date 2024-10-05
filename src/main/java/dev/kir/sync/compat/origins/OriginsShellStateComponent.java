@@ -6,12 +6,14 @@ import io.github.apace100.origins.component.OriginComponent;
 import io.github.apace100.origins.networking.ModPackets;
 import io.github.apace100.origins.origin.Origin;
 import io.github.apace100.origins.origin.OriginLayer;
+import io.github.apace100.origins.origin.OriginLayerManager;
 import io.github.apace100.origins.registry.ModComponents;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -82,9 +84,9 @@ class OriginsShellStateComponent extends ShellStateComponent {
             powerHolderComponent.readFromNbt(this.powerHolderComponentNbt);
             originComponent.sync();
         } else {
-            for (OriginLayer layer : OriginLayers.getLayers()) {
-                if (layer.isEnabled()) {
-                    originComponent.setOrigin(layer, Origin.EMPTY);
+            for (var layer : OriginLayerManager.entrySet()) {
+                if (layer.getValue().isEnabled()) {
+                    originComponent.setOrigin(layer.getValue(), Origin.EMPTY);
                 }
             }
             originComponent.checkAutoChoosingLayers(this.player, false);
