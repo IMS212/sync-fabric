@@ -23,7 +23,7 @@ public class Sync implements ModInitializer, ClientModInitializer {
     private static final SyncConfig CONFIG = SyncConfig.resolve();
 
     public static Identifier locate(String location) {
-        return new Identifier(MOD_ID, location);
+        return Identifier.of(MOD_ID, location);
     }
 
     public static SyncConfig getConfig() {
@@ -37,7 +37,7 @@ public class Sync implements ModInitializer, ClientModInitializer {
         SyncItems.init();
         SyncPackets.init();
         SyncCommands.init();
-        Registry.register(Registries.ITEM_GROUP, new Identifier("sync", "sync"), SyncItemGroups.MAIN);
+        Registry.register(Registries.ITEM_GROUP, Identifier.of("sync", "sync"), SyncItemGroups.MAIN);
     }
 
     @Override

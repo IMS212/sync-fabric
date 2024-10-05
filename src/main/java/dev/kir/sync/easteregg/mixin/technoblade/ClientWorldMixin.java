@@ -98,7 +98,7 @@ abstract class ClientWorldMixin extends World {
             return null;
         }
 
-        SoundEvent fixedSound = Registries.SOUND_EVENT.get(new Identifier(originalSoundId.getNamespace(), originalSoundId.getPath().replaceFirst("\\.[^.]+", ".player")));
+        SoundEvent fixedSound = Registries.SOUND_EVENT.get(Identifier.of(originalSoundId.getNamespace(), originalSoundId.getPath().replaceFirst("\\.[^.]+", ".player")));
         if (fixedSound == null) {
             fixedSound = sound;
         }

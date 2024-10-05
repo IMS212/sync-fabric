@@ -40,7 +40,7 @@ public final class GeneratedTextureManager {
         TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
         List<Identifier> textures = new ArrayList<>();
         for (AbstractTexture texture : (Iterable<AbstractTexture>)generator.generateTextures()::iterator) {
-            Identifier id = new Identifier("__dynamic", format + (++textureCounter));
+            Identifier id = Identifier.of("__dynamic", format + (++textureCounter));
             textureManager.registerTexture(id, texture);
             textures.add(id);
         }

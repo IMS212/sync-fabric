@@ -14,7 +14,7 @@ import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 
 public final class ItemUtil {
-    private static final TagKey<Item> WRENCHES = TagKey.of(RegistryKeys.ITEM, new Identifier("c:wrenches"));
+    private static final TagKey<Item> WRENCHES = TagKey.of(RegistryKeys.ITEM, Identifier.of("c:wrenches"));
 
     public static boolean isWrench(ItemStack itemStack) {
         if (itemStack.isIn(WRENCHES)) {
