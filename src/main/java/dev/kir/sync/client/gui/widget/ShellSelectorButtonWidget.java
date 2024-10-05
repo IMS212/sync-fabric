@@ -3,6 +3,7 @@ package dev.kir.sync.client.gui.widget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.kir.sync.client.gl.MSAAFramebuffer;
 import dev.kir.sync.client.render.MatrixStackStorage;
+import dev.kir.sync.util.client.render.ColorUtil;
 import dev.kir.sync.util.client.render.RenderSystemUtil;
 import dev.kir.sync.api.shell.ClientShell;
 import dev.kir.sync.api.shell.ShellState;
@@ -157,11 +158,11 @@ public class ShellSelectorButtonWidget extends AbstractWidget {
         float alpha = this.isPressed() ? this.pressedAlpha : this.isHovered() ? this.hoveredAlpha : this.alpha;
         DyeColor borderColor = this.shell == null ? null : this.shell.getColor();
         DyeColor color = borderColor != null && (this.isHovered() || this.isPressed()) ? borderColor : this.color;
-        float[] rgb = color.getEntityColor();
+        float[] rgb = ColorUtil.toRGBA(color.getEntityColor());
         RenderSystemUtil.drawAnnulusSector(matrices, this.cX, this.cY, this.majorR, this.minorR, this.from, this.to, this.step, rgb[0], rgb[1], rgb[2], alpha);
 
         if (borderColor != null) {
-            rgb = borderColor.getEntityColor();
+            rgb = ColorUtil.toRGBA(borderColor.getEntityColor());
             RenderSystemUtil.drawAnnulusSector(matrices, this.cX, this.cY, this.majorR, this.minorRBorder, this.from, this.to, this.step, rgb[0], rgb[1], rgb[2], 1F);
         }
     }
