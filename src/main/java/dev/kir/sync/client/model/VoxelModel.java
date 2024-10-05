@@ -60,15 +60,15 @@ public class VoxelModel extends Model {
     }
 
     @Override
-    public void render(MatrixStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {
+    public void render(MatrixStack matrices, VertexConsumer vertices, int light, int overlay, int color) {
         if (this.destructionProgress > 0) {
-            this.renderWithDestruction(matrices, vertices, light, overlay, red, green, blue, alpha);
+            this.renderWithDestruction(matrices, vertices, light, overlay, color);
         } else {
-            this.renderWithoutDestruction(matrices, vertices, light, overlay, red, green, blue, alpha);
+            this.renderWithoutDestruction(matrices, vertices, light, overlay, color);
         }
     }
 
-    private void renderWithoutDestruction(MatrixStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {
+    private void renderWithoutDestruction(MatrixStack matrices, VertexConsumer vertices, int light, int overlay, int color) {
         ModelPart voxel = this.voxel;
         List<Voxel> voxels = this.voxels;
         int size = MathHelper.clamp((int)(voxels.size() * this.completeness), 0, voxels.size());
@@ -76,11 +76,11 @@ public class VoxelModel extends Model {
         for (int i = 0; i < size; ++i) {
             Voxel v = voxels.get(i);
             voxel.setPivot(v.x, v.y, v.z);
-            voxel.render(matrices, vertices, light, overlay, red, green, blue, alpha);
+            voxel.render(matrices, vertices, light, overlay, color);
         }
     }
 
-    private void renderWithDestruction(MatrixStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {
+    private void renderWithDestruction(MatrixStack matrices, VertexConsumer vertices, int light, int overlay, int color) {
         Random rand = this.random;
         ModelPart voxel = this.voxel;
         List<Voxel> voxels = this.voxels;
@@ -109,7 +109,7 @@ public class VoxelModel extends Model {
             float z = v.z + vZ * t;
 
             voxel.setPivot(x, y, z);
-            voxel.render(matrices, vertices, light, overlay, red, green, blue, alpha);
+            voxel.render(matrices, vertices, light, overlay, color);
         }
     }
 
