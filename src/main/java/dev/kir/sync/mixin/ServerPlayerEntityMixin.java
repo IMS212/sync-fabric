@@ -156,7 +156,7 @@ abstract class ServerPlayerEntityMixin extends PlayerEntity implements ServerShe
 
         ShellState storedState = null;
         if (currentShellContainer != null) {
-            storedState = ShellState.of(player, currentPos, currentShellContainer.getColor());
+            storedState = ShellState.of(player, currentPos, currentShellContainer.getColor(), lookup);
             currentShellContainer.setShellState(storedState);
             if (currentShellContainer.isRemotelyAccessible()) {
                 this.add(storedState);
@@ -311,7 +311,7 @@ abstract class ServerPlayerEntityMixin extends PlayerEntity implements ServerShe
         }
 
         if (!this.isSpectator()) {
-            this.drop(source);
+            this.drop(getServerWorld(), source);
         }
 
         this.undead = true;
@@ -451,21 +451,21 @@ abstract class ServerPlayerEntityMixin extends PlayerEntity implements ServerShe
         ServerPlayerEntity serverPlayer = (ServerPlayerEntity)(Object)this;
 
         WorldProperties worldProperties = targetWorld.getLevelProperties();
-        serverPlayer.networkHandler.sendPacket(new PlayerRespawnS2CPacket(new CommonPlayerSpawnInfo(targetWorld.getDimensionKey(), targetWorld.getRegistryKey(), BiomeAccess.hashSeed(targetWorld.getSeed()), serverPlayer.interactionManager.getGameMode(), serverPlayer.interactionManager.getPreviousGameMode(), targetWorld.isDebugWorld(), targetWorld.isFlat(), this.getLastDeathPos(), this.getId()), (byte) 3));
+        serverPlayer.networkHandler.sendPacket(new PlayerRespawnS2CPacket(new CommonPlayerSpawnInfo(targetWorld.getDimensionEntry(), targetWorld.getRegistryKey(), BiomeAccess.hashSeed(targetWorld.getSeed()), serverPlayer.interactionManager.getGameMode(), serverPlayer.interactionManager.getPreviousGameMode(), targetWorld.isDebugWorld(), targetWorld.isFlat(), this.getLastDeathPos(), this.getId()), (byte) 3));
         serverPlayer.networkHandler.sendPacket(new DifficultyS2CPacket(worldProperties.getDifficulty(), worldProperties.isDifficultyLocked()));
         PlayerManager playerManager = Objects.requireNonNull(this.getWorld().getServer()).getPlayerManager();
         playerManager.sendCommandTree(serverPlayer);
         serverWorld.removePlayer(serverPlayer, RemovalReason.CHANGED_DIMENSION);
         this.unsetRemoved();
         serverPlayer.setWorld(targetWorld);
-        targetWorld.onPlayerChangeDimension(serverPlayer);
+        targetWorld.onDimensionChanged(serverPlayer);
         this.networkHandler.requestTeleport(x, y, z, yaw, pitch);
         this.worldChanged(targetWorld);
         serverPlayer.networkHandler.sendPacket(new PlayerAbilitiesS2CPacket(serverPlayer.getAbilities()));
         playerManager.sendWorldInfo(serverPlayer, targetWorld);
         playerManager.sendPlayerStatus(serverPlayer);
         for (StatusEffectInstance statusEffectInstance : this.getStatusEffects()) {
-            this.networkHandler.sendPacket(new EntityStatusEffectS2CPacket(this.getId(), statusEffectInstance));
+            this.networkHandler.sendPacket(new EntityStatusEffectS2CPacket(this.getId(), statusEffectInstance, false)); // TODO: Not sure about the keepFading value
         }
         this.onTeleportationDone();
     }
