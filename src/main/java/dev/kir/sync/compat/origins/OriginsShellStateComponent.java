@@ -12,6 +12,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 class OriginsShellStateComponent extends ShellStateComponent {
@@ -61,7 +62,7 @@ class OriginsShellStateComponent extends ShellStateComponent {
     }
 
     @Override
-    public void clone(ShellStateComponent component) {
+    public void clone(ShellStateComponent component, RegistryWrapper.WrapperLookup lookup) {
         OriginsShellStateComponent other = component.as(OriginsShellStateComponent.class);
         if (other == null) {
             return;

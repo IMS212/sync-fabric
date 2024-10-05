@@ -2,6 +2,7 @@ package dev.kir.sync.api.shell;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -35,7 +36,7 @@ public abstract class ShellStateComponent {
      * Clones state of the given component.
      * @param component The component.
      */
-    public abstract void clone(ShellStateComponent component);
+    public abstract void clone(ShellStateComponent component, RegistryWrapper.WrapperLookup lookup);
 
     /**
      * Restores state of the component from the nbt data.
@@ -162,7 +163,7 @@ public abstract class ShellStateComponent {
         }
 
         @Override
-        public void clone(ShellStateComponent component) { }
+        public void clone(ShellStateComponent component, RegistryWrapper.WrapperLookup lookup) { }
 
         @Override
         public void readNbt(NbtCompound nbt) { }
@@ -217,9 +218,9 @@ public abstract class ShellStateComponent {
         }
 
         @Override
-        public void clone(ShellStateComponent component) {
+        public void clone(ShellStateComponent component, RegistryWrapper.WrapperLookup lookup) {
             for (ShellStateComponent innerComponent : this.components) {
-                innerComponent.clone(component);
+                innerComponent.clone(component, lookup);
             }
         }
 

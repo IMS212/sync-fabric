@@ -12,6 +12,7 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.RegistryWrapper;
 
 import java.util.*;
 
@@ -57,7 +58,7 @@ class TrinketShellStateComponent extends ShellStateComponent {
     }
 
     @Override
-    public void clone(ShellStateComponent component) {
+    public void clone(ShellStateComponent component, RegistryWrapper.WrapperLookup lookup) {
         this.clear();
         TrinketShellStateComponent trinketComponent = component.as(TrinketShellStateComponent.class);
         if (trinketComponent == null) {

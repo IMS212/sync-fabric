@@ -60,7 +60,7 @@ public class SynchronizationRequestPacket implements ServerPlayerPacket {
         Identifier currentWorldId = WorldUtil.getId(currentWorld);
         Direction currentFacing = BlockPosUtil.getHorizontalFacing(currentPos, currentWorld).orElse(player.getHorizontalFacing().getOpposite());
 
-        shell.sync(state).ifLeft(storedState -> {
+        shell.sync(state, currentWorld.getRegistryManager()).ifLeft(storedState -> {
             Objects.requireNonNull(state);
             Identifier targetWorldId = state.getWorld();
             BlockPos targetPos = state.getPos();

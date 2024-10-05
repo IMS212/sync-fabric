@@ -14,6 +14,7 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.DyeColor;
@@ -161,8 +162,8 @@ public class ShellState {
      * @param pos Position of the shell.
      * @return Empty shell of the specified player.
      */
-    public static ShellState empty(ServerPlayerEntity player, BlockPos pos) {
-        return empty(player, pos, null);
+    public static ShellState empty(ServerPlayerEntity player, BlockPos pos, RegistryWrapper.WrapperLookup lookup) {
+        return empty(player, pos, null, lookup);
     }
 
     /**
@@ -173,8 +174,8 @@ public class ShellState {
      * @param color Color of the shell.
      * @return Empty shell of the specified player.
      */
-    public static ShellState empty(ServerPlayerEntity player, BlockPos pos, DyeColor color) {
-        return create(player, pos, color, 0, true, false);
+    public static ShellState empty(ServerPlayerEntity player, BlockPos pos, DyeColor color, RegistryWrapper.WrapperLookup lookup) {
+        return create(player, pos, color, 0, true, false, lookup);
     }
 
     /**
@@ -196,8 +197,8 @@ public class ShellState {
      * @param color Color of the shell.
      * @return Shell that is a full copy of the specified player.
      */
-    public static ShellState of(ServerPlayerEntity player, BlockPos pos, DyeColor color) {
-        return create(player, pos, color, 1, ((Shell)player).isArtificial(), true);
+    public static ShellState of(ServerPlayerEntity player, BlockPos pos, DyeColor color, RegistryWrapper.WrapperLookup lookup) {
+        return create(player, pos, color, 1, ((Shell)player).isArtificial(), true, lookup);
     }
 
     /**
@@ -211,7 +212,7 @@ public class ShellState {
         return state;
     }
 
-    private static ShellState create(ServerPlayerEntity player, BlockPos pos, DyeColor color, float progress, boolean isArtificial, boolean copyPlayerState) {
+    private static ShellState create(ServerPlayerEntity player, BlockPos pos, DyeColor color, float progress, boolean isArtificial, boolean copyPlayerState, RegistryWrapper.WrapperLookup lookup) {
         ShellState shell = new ShellState();
 
         shell.uuid = UUID.randomUUID();
@@ -228,7 +229,7 @@ public class ShellState {
         if (copyPlayerState) {
             shell.health = player.getHealth();
             shell.inventory.clone(player.getInventory());
-            shell.component.clone(ShellStateComponent.of(player));
+            shell.component.clone(ShellStateComponent.of(player), lookup);
 
             shell.foodLevel = player.getHungerManager().getFoodLevel();
             shell.saturationLevel = player.getHungerManager().getSaturationLevel();

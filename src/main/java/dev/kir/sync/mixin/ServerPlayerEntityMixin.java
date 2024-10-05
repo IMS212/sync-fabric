@@ -21,6 +21,7 @@ import net.minecraft.network.PacketCallbacks;
 import net.minecraft.network.encryption.PlayerPublicKey;
 import net.minecraft.network.packet.c2s.play.TeleportConfirmC2SPacket;
 import net.minecraft.network.packet.s2c.play.*;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.scoreboard.AbstractTeam;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
@@ -112,7 +113,7 @@ abstract class ServerPlayerEntityMixin extends PlayerEntity implements ServerShe
     }
 
     @Override
-    public Either<ShellState, PlayerSyncEvents.SyncFailureReason> sync(ShellState state) {
+    public Either<ShellState, PlayerSyncEvents.SyncFailureReason> sync(ShellState state, RegistryWrapper.WrapperLookup lookup) {
         ServerPlayerEntity player = (ServerPlayerEntity)(Object)this;
         BlockPos currentPos = this.getBlockPos();
         World currentWorld = player.getWorld();
@@ -164,14 +165,14 @@ abstract class ServerPlayerEntityMixin extends PlayerEntity implements ServerShe
 
         targetShellContainer.setShellState(null);
         this.remove(state);
-        this.apply(state);
+        this.apply(state, lookup);
 
         PlayerSyncEvents.STOP_SYNCING.invoker().onStopSyncing(player, currentPos, storedState);
         return Either.left(storedState);
     }
 
     @Override
-    public void apply(ShellState state) {
+    public void apply(ShellState state, RegistryWrapper.WrapperLookup lookup) {
         Objects.requireNonNull(state);
 
         ServerPlayerEntity serverPlayer = (ServerPlayerEntity)(Object)this;
@@ -198,7 +199,7 @@ abstract class ServerPlayerEntityMixin extends PlayerEntity implements ServerShe
         inventory.selectedSlot = selectedSlot;
 
         ShellStateComponent playerComponent = ShellStateComponent.of(serverPlayer);
-        playerComponent.clone(state.getComponent());
+        playerComponent.clone(state.getComponent(), lookup);
 
         serverPlayer.changeGameMode(GameMode.byId(state.getGameMode()));
         this.setHealth(state.getHealth());

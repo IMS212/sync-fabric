@@ -1,6 +1,7 @@
 package dev.kir.sync.compat.cca;
 
 import dev.kir.sync.api.shell.ShellStateComponent;
+import net.minecraft.registry.RegistryWrapper;
 import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import net.minecraft.nbt.NbtCompound;
@@ -19,11 +20,11 @@ public abstract class CCAShellStateComponent extends ShellStateComponent {
         this.thisClass = this.getClass();
     }
 
-    public NbtCompound getComponentNbt() {
+    public NbtCompound getComponentNbt(RegistryWrapper.WrapperLookup lookup) {
         NbtCompound nbt = this.componentNbt;
         if (this.player != null) {
             nbt = new NbtCompound();
-            this.componentKey.get(this.player).writeToNbt(nbt);
+            this.componentKey.get(this.player).writeToNbt(nbt, lookup);
         }
         return nbt == null ? new NbtCompound() : nbt;
     }
@@ -34,7 +35,7 @@ public abstract class CCAShellStateComponent extends ShellStateComponent {
     }
 
     @Override
-    public void clone(ShellStateComponent component) {
+    public void clone(ShellStateComponent component, RegistryWrapper.WrapperLookup lookup) {
         CCAShellStateComponent other = component.as(this.thisClass);
         if (other == null) {
             return;
@@ -46,7 +47,7 @@ public abstract class CCAShellStateComponent extends ShellStateComponent {
         }
 
         Component playerComponent = this.componentKey.get(this.player);
-        playerComponent.readFromNbt(this.componentNbt);
+        playerComponent.readFromNbt(this.componentNbt, lookup);
         this.componentKey.sync(this.player);
     }
 
