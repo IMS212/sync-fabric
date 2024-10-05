@@ -10,5 +10,5 @@ import net.minecraft.client.render.VertexFormats;
 @Environment(EnvType.CLIENT)
 public final class CustomVertexFormats extends VertexFormats {
     // TODO: Padding went poof :despair:
-    public static final VertexFormat POSITION_COLOR_OVERLAY_LIGHT_NORMAL = new VertexFormat((ImmutableMap.<String, VertexFormatElement>builder()).put("Position", VertexFormatElement.POSITION).put("Color", VertexFormatElement.COLOR).put("UV1", VertexFormatElement.UV_1).put("UV2", VertexFormatElement.UV_2).put("Normal", VertexFormatElement.NORMAL).put("Padding", PADDING_ELEMENT).build());
+    public static final VertexFormat POSITION_COLOR_OVERLAY_LIGHT_NORMAL = VertexFormat.builder().add("Position", VertexFormatElement.POSITION).add("Color", VertexFormatElement.COLOR).add("UV1", VertexFormatElement.UV_1).add("UV2", VertexFormatElement.UV_2).add("Normal", VertexFormatElement.NORMAL).build();
 }
