@@ -28,6 +28,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Hand;
+import net.minecraft.util.ItemActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -202,7 +203,7 @@ public abstract class AbstractShellContainerBlockEntity extends BlockEntity impl
         }
     }
 
-    public abstract ActionResult onUse(World world, BlockPos pos, PlayerEntity player, Hand hand);
+    public abstract ItemActionResult onUse(World world, BlockPos pos, PlayerEntity player, Hand hand);
 
     @Environment(EnvType.CLIENT)
     public float getDoorOpenProgress(float tickDelta) {

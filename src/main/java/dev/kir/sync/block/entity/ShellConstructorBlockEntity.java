@@ -18,6 +18,7 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.ItemActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -39,13 +40,13 @@ public class ShellConstructorBlockEntity extends AbstractShellContainerBlockEnti
     }
 
     @Override
-    public ActionResult onUse(World world, BlockPos pos, PlayerEntity player, Hand hand) {
+    public ItemActionResult onUse(World world, BlockPos pos, PlayerEntity player, Hand hand) {
         PlayerSyncEvents.ShellConstructionFailureReason failureReason = this.beginShellConstruction(player);
         if (failureReason == null) {
-            return ActionResult.SUCCESS;
+            return ItemActionResult.SUCCESS;
         } else {
             player.sendMessage(failureReason.toText(), true);
-            return ActionResult.CONSUME;
+            return ItemActionResult.CONSUME;
         }
     }
 
