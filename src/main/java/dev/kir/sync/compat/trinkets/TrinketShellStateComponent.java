@@ -96,7 +96,7 @@ class TrinketShellStateComponent extends ShellStateComponent {
                 NbtList list = new NbtList();
                 Inventory inv = slot.getValue();
                 for (int i = 0; i < inv.size(); i++) {
-                    list.add(inv.getStack(i).writeNbt(new NbtCompound()));
+                    list.add(inv.getStack(i).encode(lookup));
                 }
                 slotTag.put("Items", list);
                 groupTag.put(slot.getKey(), slotTag);

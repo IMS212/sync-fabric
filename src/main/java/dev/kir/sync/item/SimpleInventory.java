@@ -9,6 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.BuiltinRegistries;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
 import net.minecraft.util.Nameable;
 import net.minecraft.util.collection.DefaultedList;
@@ -118,7 +119,7 @@ public class SimpleInventory implements Inventory, Nameable {
         return false;
     }
 
-    public NbtList writeNbt(NbtList nbtList) {
+    public NbtList writeNbt(NbtList nbtList, RegistryWrapper.WrapperLookup lookup) {
         for (Map.Entry<DefaultedList<ItemStack>, Integer> inventoryInfo : Map.of(this.main, 0, this.armor, 100, this.offHand, 150).entrySet()) {
             DefaultedList<ItemStack> inventory = inventoryInfo.getKey();
             int delta = inventoryInfo.getValue();
@@ -126,8 +127,7 @@ public class SimpleInventory implements Inventory, Nameable {
                 if (!inventory.get(i).isEmpty()) {
                     NbtCompound compound = new NbtCompound();
                     compound.putByte("Slot", (byte)(i + delta));
-                    inventory.get(i).writeNbt(compound);
-                    nbtList.add(compound);
+                    nbtList.add(inventory.get(i).encode(lookup));
                 }
             }
         }
