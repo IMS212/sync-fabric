@@ -4,6 +4,7 @@ import dev.kir.sync.api.shell.ShellStateComponent;
 import io.github.apace100.apoli.component.PowerHolderComponent;
 import io.github.apace100.origins.component.OriginComponent;
 import io.github.apace100.origins.networking.ModPackets;
+import io.github.apace100.origins.networking.packet.s2c.OpenChooseOriginScreenS2CPacket;
 import io.github.apace100.origins.origin.Origin;
 import io.github.apace100.origins.origin.OriginLayer;
 import io.github.apace100.origins.origin.OriginLayerManager;
@@ -93,7 +94,7 @@ class OriginsShellStateComponent extends ShellStateComponent {
             originComponent.sync();
             PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
             data.writeBoolean(false);
-            ServerPlayNetworking.send(this.player, ModPackets.OPEN_ORIGIN_SCREEN, data);
+            ServerPlayNetworking.send(this.player, new OpenChooseOriginScreenS2CPacket(true));
             this.activated = true;
         }
     }
