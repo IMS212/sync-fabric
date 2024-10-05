@@ -256,7 +256,7 @@ public class TreadmillBlockEntity extends BlockEntity implements DoubleBlockEnti
     @Override
     public NbtCompound toInitialChunkDataNbt(RegistryWrapper.WrapperLookup lookup) {
         NbtCompound nbt = super.toInitialChunkDataNbt(lookup);
-        this.writeNbt(nbt);
+        this.writeNbt(nbt, lookup);
         return nbt;
     }
 
