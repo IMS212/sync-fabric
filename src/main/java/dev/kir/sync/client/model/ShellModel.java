@@ -55,9 +55,9 @@ public class ShellModel<T extends AnimalModel<?>> extends Model {
     }
 
     @Override
-    public void render(MatrixStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {
+    public void render(MatrixStack matrices, VertexConsumer vertices, int light, int overlay, int color) {
         Model target = (this.isBeingPrinted() || this.isBeingDestroyed()) ? this.voxelModel : this.parentModel;
-        target.render(matrices, vertices, light, overlay, red, green, blue, alpha);
+        target.render(matrices, vertices, light, overlay, color);
     }
 
     private boolean isBeingPrinted() {
