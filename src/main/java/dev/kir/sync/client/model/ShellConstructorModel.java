@@ -121,22 +121,22 @@ public class ShellConstructorModel extends AbstractShellContainerModel {
         float printerY = MIN_PRINTER_Y + PRINTER_HEIGHT * (printingProgress <= 1F ? printingProgress : (1F - paintingProgress));
         float sprayerY = MIN_SPRAYER_Y + SPRAYER_HEIGHT * (printingProgress < SPRAYER_ACTIVATION_STAGE ? 0 : printingProgress <= 1F ? ((printingProgress - SPRAYER_ACTIVATION_STAGE) / (1F - SPRAYER_ACTIVATION_STAGE)) : (1F - paintingProgress));
 
-        this.renderPrinter(printerY, matrices, vertices, light, overlay, red, green, blue, alpha);
-        this.renderSprayer(sprayerY, true, matrices, vertices, light, overlay, red, green, blue, alpha);
+        this.renderPrinter(printerY, matrices, vertices, light, overlay, color);
+        this.renderSprayer(sprayerY, true, matrices, vertices, light, overlay, color);
 
         if (sprayerY < MAST_Y) {
-            this.renderSprayer(MAST_Y, false, matrices, vertices, light, overlay, red, green, blue, alpha);
+            this.renderSprayer(MAST_Y, false, matrices, vertices, light, overlay, color);
         }
     }
 
-    private void renderSprayer(float y, boolean isFullyVisible, MatrixStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {
+    private void renderSprayer(float y, boolean isFullyVisible, MatrixStack matrices, VertexConsumer vertices, int light, int overlay, int color) {
         this.sprayerRMast.pivotY = y;
         this.sprayerGMast.pivotY = y;
         this.sprayerBMast.pivotY = y;
 
-        this.sprayerRMast.render(matrices, vertices, light, overlay, red, green, blue, alpha);
-        this.sprayerGMast.render(matrices, vertices, light, overlay, red, green, blue, alpha);
-        this.sprayerBMast.render(matrices, vertices, light, overlay, red, green, blue, alpha);
+        this.sprayerRMast.render(matrices, vertices, light, overlay, color);
+        this.sprayerGMast.render(matrices, vertices, light, overlay, color);
+        this.sprayerBMast.render(matrices, vertices, light, overlay, color);
 
         if (!isFullyVisible) {
             return;
@@ -147,16 +147,16 @@ public class ShellConstructorModel extends AbstractShellContainerModel {
         this.sprayerG.pivotY = y;
         this.sprayerB.pivotY = y;
 
-        this.sprayerR.render(matrices, vertices, light, overlay, red, green, blue, alpha);
-        this.sprayerG.render(matrices, vertices, light, overlay, red, green, blue, alpha);
-        this.sprayerB.render(matrices, vertices, light, overlay, red, green, blue, alpha);
+        this.sprayerR.render(matrices, vertices, light, overlay, color);
+        this.sprayerG.render(matrices, vertices, light, overlay, color);
+        this.sprayerB.render(matrices, vertices, light, overlay, color);
     }
 
-    private void renderPrinter(float y, MatrixStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {
+    private void renderPrinter(float y, MatrixStack matrices, VertexConsumer vertices, int light, int overlay, int color) {
         this.printerL.pivotY = y;
         this.printerR.pivotY = y;
 
-        this.printerL.render(matrices, vertices, light, overlay, red, green, blue, alpha);
-        this.printerR.render(matrices, vertices, light, overlay, red, green, blue, alpha);
+        this.printerL.render(matrices, vertices, light, overlay, color);
+        this.printerR.render(matrices, vertices, light, overlay, color);
     }
 }
