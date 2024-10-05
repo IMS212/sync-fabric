@@ -69,7 +69,7 @@ public class NbtSerializerFactoryBuilder<TTarget> {
         NBT_GETTERS.put(Long.class, getOrDefault(NbtCompound::getLong));
         NBT_GETTERS.put(Short.class, getOrDefault(NbtCompound::getShort));
         NBT_GETTERS.put(String.class, getOrDefault(NbtCompound::getString));
-        NBT_GETTERS.put(Identifier.class, getOrDefault((x, key) -> new Identifier(x.getString(key))));
+        NBT_GETTERS.put(Identifier.class, getOrDefault((x, key) -> Identifier.of(x.getString(key))));
         NBT_GETTERS.put(UUID.class, getOrDefault(NbtCompound::getUuid));
         NBT_GETTERS.put(NbtCompound.class, getOrDefault(NbtCompound::getCompound));
         NBT_GETTERS.put(NbtList.class, getOrDefault(NbtCompound::get));
