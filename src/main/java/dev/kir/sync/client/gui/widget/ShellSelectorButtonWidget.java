@@ -3,7 +3,6 @@ package dev.kir.sync.client.gui.widget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.kir.sync.client.gl.MSAAFramebuffer;
 import dev.kir.sync.client.render.MatrixStackStorage;
-import dev.kir.sync.util.client.render.ColorUtil;
 import dev.kir.sync.util.client.render.RenderSystemUtil;
 import dev.kir.sync.api.shell.ClientShell;
 import dev.kir.sync.api.shell.ShellState;
@@ -234,7 +233,7 @@ public class ShellSelectorButtonWidget extends AbstractWidget {
         matrices.push();
         matrices.translate(0, 0, this.majorR * 2);
         RenderSystemUtil.drawRectangle(matrices, boxLeft, boxTop, progressBoxWidth, boxHeight, boxHeight * 0.25F, 1F, 0, (float)this.step, 0F, 0F, 0F, 0.8F);
-        RenderSystemUtil.drawCenteredText(drawContext, progressText, shellCX, shellCY, fontScale, ColorUtil.fromDyeColor(DyeColor.WHITE), true);
+        RenderSystemUtil.drawCenteredText(drawContext, progressText, shellCX, shellCY, fontScale, DyeColor.WHITE.getEntityColor(), true);
         matrices.pop();
     }
 

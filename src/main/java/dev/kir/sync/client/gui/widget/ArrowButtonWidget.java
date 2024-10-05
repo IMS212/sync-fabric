@@ -9,18 +9,15 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 
-import java.util.function.Supplier;
-
 @Environment(EnvType.CLIENT)
 public class ArrowButtonWidget extends ButtonWidget {
     private static final Text DEFAULT_DESCRIPTION = null;
-    private static final int DEFAULT_COLOR = ColorUtil.fromDyeColor(DyeColor.WHITE);
+    private static final int DEFAULT_COLOR = DyeColor.WHITE.getEntityColor();
     private static final float DEFAULT_STEP = Radians.R_PI_32;
 
     public final ArrowType type;
