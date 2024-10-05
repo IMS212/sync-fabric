@@ -43,11 +43,11 @@ class OriginsShellStateComponent extends ShellStateComponent {
         return this.activated;
     }
 
-    public NbtCompound getOriginComponentNbt() {
+    public NbtCompound getOriginComponentNbt(RegistryWrapper.WrapperLookup lookup) {
         NbtCompound nbt = this.originComponentNbt;
         if (this.player != null) {
             nbt = new NbtCompound();
-            ModComponents.ORIGIN.get(this.player).writeToNbt(nbt);
+            ModComponents.ORIGIN.get(this.player).writeToNbt(nbt, lookup);
         }
         return nbt == null ? new NbtCompound() : nbt;
     }
@@ -68,7 +68,7 @@ class OriginsShellStateComponent extends ShellStateComponent {
             return;
         }
 
-        this.originComponentNbt = other.getOriginComponentNbt();
+        this.originComponentNbt = other.getOriginComponentNbt(lookup);
         this.powerHolderComponentNbt = other.getPowerHolderComponentNbt();
         this.activated = other.isActivated();
         if (this.player == null) {
@@ -105,7 +105,7 @@ class OriginsShellStateComponent extends ShellStateComponent {
 
     @Override
     protected NbtCompound writeComponentNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        nbt.put("origins", this.getOriginComponentNbt());
+        nbt.put("origins", this.getOriginComponentNbt(lookup));
         nbt.put("powers", this.getPowerHolderComponentNbt());
         nbt.putBoolean("activated", this.isActivated());
         return nbt;
