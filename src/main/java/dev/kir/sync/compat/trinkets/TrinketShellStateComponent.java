@@ -12,6 +12,7 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.BuiltinRegistries;
 import net.minecraft.registry.RegistryWrapper;
 
 import java.util.*;
@@ -113,6 +114,8 @@ class TrinketShellStateComponent extends ShellStateComponent {
             if (groupTag == null || groupSlots == null) {
                 continue;
             }
+            // TODO WARN Potentially jank
+            var lookup = BuiltinRegistries.createWrapperLookup();
 
             for (String slotKey : groupTag.getKeys()) {
                 NbtCompound slotTag = groupTag.getCompound(slotKey);
@@ -124,7 +127,7 @@ class TrinketShellStateComponent extends ShellStateComponent {
 
                 int size = Math.min(list.size(), inv.size());
                 for (int i = 0; i < size; i++) {
-                    ItemStack stack = ItemStack.fromNbt(list.getCompound(i));
+                    ItemStack stack = ItemStack.fromNbtOrEmpty(lookup, list.getCompound(i));
                     inv.setStack(i, stack);
                 }
             }
