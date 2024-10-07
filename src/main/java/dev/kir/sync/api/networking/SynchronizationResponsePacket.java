@@ -12,12 +12,17 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtSizeTracker;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 
-public class SynchronizationResponsePacket implements ClientPlayerPacket {
+public class SynchronizationResponsePacket implements CustomPayload {
+    public static final CustomPayload.Id<SynchronizationResponsePacket> ID = new CustomPayload.Id<>(Sync.locate("packet.shell.synchronization.response"));
+    public static final PacketCodec<PacketByteBuf, SynchronizationResponsePacket> CODEC = PacketCodec.of(SynchronizationResponsePacket::write, SynchronizationResponsePacket::new);
     private Identifier startWorld;
     private BlockPos startPos;
     private Direction startFacing;
@@ -36,12 +41,15 @@ public class SynchronizationResponsePacket implements ClientPlayerPacket {
         this.storedState = storedState;
     }
 
-    @Override
-    public Identifier getId() {
-        return Sync.locate("packet.shell.synchronization.response");
+    public SynchronizationResponsePacket(PacketByteBuf byteBuf) {
+        read(byteBuf);
     }
 
     @Override
+    public Id<SynchronizationResponsePacket> getId() {
+        return ID;
+    }
+
     public void write(PacketByteBuf buffer) {
         buffer.writeIdentifier(this.startWorld);
         buffer.writeBlockPos(this.startPos);
@@ -57,7 +65,6 @@ public class SynchronizationResponsePacket implements ClientPlayerPacket {
         }
     }
 
-    @Override
     public void read(PacketByteBuf buffer) {
         this.startWorld = buffer.readIdentifier();
         this.startPos = buffer.readBlockPos();
@@ -68,12 +75,10 @@ public class SynchronizationResponsePacket implements ClientPlayerPacket {
         this.storedState = buffer.readBoolean() ? ShellState.fromNbt((NbtCompound) buffer.readNbt(NbtSizeTracker.ofUnlimitedBytes())) : null;
     }
 
-    @Override
     public Identifier getTargetWorldId() {
         return this.targetWorld;
     }
 
-    @Override
     @Environment(EnvType.CLIENT)
     public void execute(MinecraftClient client, ClientPlayerEntity player, ClientPlayNetworkHandler handler, PacketSender responseSender) {
         ((ClientShell)player).endSync(this.startWorld, this.startPos, this.startFacing, this.targetWorld, this.targetPos, this.targetFacing, this.storedState);
