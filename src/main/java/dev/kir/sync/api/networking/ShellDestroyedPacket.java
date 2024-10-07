@@ -3,46 +3,39 @@ package dev.kir.sync.api.networking;
 import dev.kir.sync.Sync;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 
-public class ShellDestroyedPacket implements ClientPlayerPacket {
-    private BlockPos pos;
+public class ShellDestroyedPacket implements CustomPayload {
+    public static final CustomPayload.Id<ShellDestroyedPacket> ID = new CustomPayload.Id<>(Sync.locate("packet.shell.destroyed"));
+    public static final PacketCodec<RegistryByteBuf, ShellDestroyedPacket> CODEC = BlockPos.PACKET_CODEC.xmap(ShellDestroyedPacket::new, ShellDestroyedPacket::getBlockPos).cast();
+    private BlockPos blockPos;
 
-    public ShellDestroyedPacket(BlockPos pos) {
-        this.pos = pos == null ? BlockPos.ORIGIN : pos;
+    public ShellDestroyedPacket(BlockPos blockPos) {
+        this.blockPos = blockPos;
+    }
+
+    public BlockPos getBlockPos() {
+        return blockPos;
     }
 
     @Override
-    public Identifier getId() {
-        return Sync.locate("packet.shell.destroyed");
-    }
-
-    @Override
-    public void write(PacketByteBuf buffer) {
-        buffer.writeBlockPos(this.pos);
-    }
-
-    @Override
-    public void read(PacketByteBuf buffer) {
-        this.pos = buffer.readBlockPos();
+    public Id<? extends CustomPayload> getId() {
+        return ID;
     }
 
     @Environment(EnvType.CLIENT)
-    @Override
-    public void execute(MinecraftClient client, ClientPlayerEntity player, ClientPlayNetworkHandler handler, PacketSender responseSender) {
+    public void apply(ClientPlayerEntity player) {
         for (int i = 0; i < 3; ++i) {
-            player.clientWorld.addBlockBreakParticles(this.pos, Blocks.DEEPSLATE.getDefaultState());
-            player.clientWorld.addBlockBreakParticles(this.pos.up(), Blocks.DEEPSLATE.getDefaultState());
+            player.clientWorld.addBlockBreakParticles(blockPos, Blocks.DEEPSLATE.getDefaultState());
+            player.clientWorld.addBlockBreakParticles(blockPos.up(), Blocks.DEEPSLATE.getDefaultState());
         }
-        player.clientWorld.playSound(player, this.pos, SoundEvents.BLOCK_DEEPSLATE_BREAK, SoundCategory.BLOCKS, 1F, player.getSoundPitch());
+        player.clientWorld.playSound(player, blockPos, SoundEvents.BLOCK_DEEPSLATE_BREAK, SoundCategory.BLOCKS, 1F, player.getSoundPitch());
     }
 }

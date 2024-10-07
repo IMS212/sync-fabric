@@ -3,47 +3,36 @@ package dev.kir.sync.api.networking;
 import dev.kir.sync.Sync;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.util.Uuids;
 
 import java.util.UUID;
 
-public class PlayerIsAlivePacket implements ClientPlayerPacket {
-    private UUID playerUuid;
+public class PlayerIsAlivePacket implements CustomPayload {
+    public static final PacketCodec<RegistryByteBuf, PlayerIsAlivePacket> CODEC = Uuids.PACKET_CODEC.xmap(PlayerIsAlivePacket::new, PlayerIsAlivePacket::getUuid).cast();
+    public static final CustomPayload.Id<PlayerIsAlivePacket> ID = new CustomPayload.Id<>(Sync.locate("packet.shell.alive"));
+    private UUID uuid;
 
-    public PlayerIsAlivePacket(PlayerEntity player) {
-        this(player == null ? null : player.getUuid());
-    }
-
-    public PlayerIsAlivePacket(UUID playerUuid) {
-        this.playerUuid = playerUuid == null ? Util.NIL_UUID : playerUuid;
-    }
-
-    @Override
-    public Identifier getId() {
-        return Sync.locate("packet.shell.alive");
+    public PlayerIsAlivePacket(UUID uuid) {
+        this.uuid = uuid;
     }
 
     @Override
-    public void write(PacketByteBuf buffer) {
-        buffer.writeUuid(this.playerUuid);
+    public Id<? extends CustomPayload> getId() {
+        return ID;
     }
 
-    @Override
-    public void read(PacketByteBuf buffer) {
-        this.playerUuid = buffer.readUuid();
+    public UUID getUuid() {
+        return uuid;
     }
 
     @Environment(EnvType.CLIENT)
-    @Override
-    public void execute(MinecraftClient client, ClientPlayerEntity player, ClientPlayNetworkHandler handler, PacketSender responseSender) {
-        PlayerEntity updatedPlayer = player.clientWorld.getPlayerByUuid(this.playerUuid);
+    public void apply(ClientPlayerEntity player) {
+        PlayerEntity updatedPlayer = player.clientWorld.getPlayerByUuid(getUuid());
         if (updatedPlayer != null) {
             if (updatedPlayer.getHealth() <= 0) {
                 updatedPlayer.setHealth(0.01F);
