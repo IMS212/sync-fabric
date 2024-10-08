@@ -18,10 +18,16 @@ public final class SyncPackets {
         PayloadTypeRegistry.playS2C().register(ShellUpdatePacket.ID, ShellUpdatePacket.CODEC);
         ClientPlayNetworking.registerGlobalReceiver(ShellUpdatePacket.ID, (payload, context) -> payload.execute(context.player()));
 
-        ClientPlayerPacket.register(ShellUpdatePacket.class);
-        ClientPlayerPacket.register(ShellStateUpdatePacket.class);
-        ClientPlayerPacket.register(SynchronizationResponsePacket.class);
-        ClientPlayerPacket.register(PlayerIsAlivePacket.class);
-        ClientPlayerPacket.register(ShellDestroyedPacket.class);
+        PayloadTypeRegistry.playS2C().register(ShellStateUpdatePacket.ID, ShellStateUpdatePacket.CODEC);
+        ClientPlayNetworking.registerGlobalReceiver(ShellStateUpdatePacket.ID, (payload, context) -> payload.execute(context.player()));
+
+        PayloadTypeRegistry.playS2C().register(SynchronizationResponsePacket.ID, SynchronizationResponsePacket.CODEC);
+        ClientPlayNetworking.registerGlobalReceiver(SynchronizationResponsePacket.ID, (payload, context) -> payload.execute(context.player()));
+
+        PayloadTypeRegistry.playS2C().register(PlayerIsAlivePacket.ID, PlayerIsAlivePacket.CODEC);
+        ClientPlayNetworking.registerGlobalReceiver(PlayerIsAlivePacket.ID, ((payload, context) -> payload.apply(context.player())));
+
+        PayloadTypeRegistry.playS2C().register(ShellDestroyedPacket.ID, ShellDestroyedPacket.CODEC);
+        ClientPlayNetworking.registerGlobalReceiver(ShellDestroyedPacket.ID, ((payload, context) -> payload.apply(context.player())));
     }
 }

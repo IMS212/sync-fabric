@@ -6,9 +6,6 @@ import dev.kir.sync.api.shell.ShellState;
 import dev.kir.sync.api.shell.ShellStateUpdateType;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtSizeTracker;
@@ -96,7 +93,7 @@ public class ShellStateUpdatePacket implements CustomPayload {
     }
 
     @Environment(EnvType.CLIENT)
-    public void execute(MinecraftClient client, ClientPlayerEntity player, ClientPlayNetworkHandler handler, PacketSender responseSender) {
+    public void execute(ClientPlayerEntity player) {
         Shell shell = (Shell)player;
         if (shell == null) {
             return;

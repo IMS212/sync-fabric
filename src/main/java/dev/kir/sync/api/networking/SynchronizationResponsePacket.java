@@ -5,14 +5,10 @@ import dev.kir.sync.api.shell.ClientShell;
 import dev.kir.sync.api.shell.ShellState;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtSizeTracker;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.util.Identifier;
@@ -80,7 +76,7 @@ public class SynchronizationResponsePacket implements CustomPayload {
     }
 
     @Environment(EnvType.CLIENT)
-    public void execute(MinecraftClient client, ClientPlayerEntity player, ClientPlayNetworkHandler handler, PacketSender responseSender) {
+    public void execute(ClientPlayerEntity player) {
         ((ClientShell)player).endSync(this.startWorld, this.startPos, this.startFacing, this.targetWorld, this.targetPos, this.targetFacing, this.storedState);
     }
 }
