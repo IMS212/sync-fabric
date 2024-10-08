@@ -10,6 +10,8 @@ import dev.kir.sync.api.shell.*;
 import dev.kir.sync.entity.KillableEntity;
 import dev.kir.sync.util.BlockPosUtil;
 import dev.kir.sync.util.WorldUtil;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
@@ -18,8 +20,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.network.PacketCallbacks;
-import net.minecraft.network.encryption.PlayerPublicKey;
-import net.minecraft.network.packet.c2s.play.TeleportConfirmC2SPacket;
 import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.scoreboard.AbstractTeam;
@@ -189,7 +189,9 @@ abstract class ServerPlayerEntityMixin extends PlayerEntity implements ServerShe
         this.setOnFire(false);
         this.clearStatusEffects();
 
-        new PlayerIsAlivePacket(serverPlayer).sendToAll(server);
+        for (var player : PlayerLookup.all(server)) {
+            ServerPlayNetworking.send(player, new PlayerIsAlivePacket(serverPlayer.getUuid()));
+        }
         this.teleport(targetWorld, state.getPos());
         this.isArtificial = state.isArtificial();
 
@@ -279,11 +281,11 @@ abstract class ServerPlayerEntityMixin extends PlayerEntity implements ServerShe
         if (this.shellDirty) {
             this.shellDirty = false;
             this.shellStateChanges.clear();
-            new ShellUpdatePacket(WorldUtil.getId(this.getWorld()), this.isArtificial, this.shellsById.values()).send(player);
+            ServerPlayNetworking.send(player, new ShellUpdatePacket(WorldUtil.getId(this.getWorld()), this.isArtificial, this.shellsById.values()));
         }
 
         for (Pair<ShellStateUpdateType, ShellState> upd : this.shellStateChanges.values()) {
-            new ShellStateUpdatePacket(upd.getLeft(), upd.getRight()).send(player);
+            ServerPlayNetworking.send(player, new ShellStateUpdatePacket(upd.getLeft(), upd.getRight()));
         }
         this.shellStateChanges.clear();
     }

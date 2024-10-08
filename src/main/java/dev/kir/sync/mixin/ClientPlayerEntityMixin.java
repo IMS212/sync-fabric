@@ -5,25 +5,25 @@ import dev.kir.sync.Sync;
 import dev.kir.sync.api.event.PlayerSyncEvents;
 import dev.kir.sync.api.networking.SynchronizationRequestPacket;
 import dev.kir.sync.api.shell.ClientShell;
+import dev.kir.sync.api.shell.ShellPriority;
 import dev.kir.sync.api.shell.ShellState;
 import dev.kir.sync.client.gui.controller.DeathScreenController;
 import dev.kir.sync.client.gui.controller.HudController;
-import dev.kir.sync.api.shell.ShellPriority;
 import dev.kir.sync.config.SyncConfig;
 import dev.kir.sync.entity.KillableEntity;
 import dev.kir.sync.entity.LookingEntity;
-import dev.kir.sync.util.BlockPosUtil;
 import dev.kir.sync.entity.PersistentCameraEntity;
 import dev.kir.sync.entity.PersistentCameraEntityGoal;
+import dev.kir.sync.util.BlockPosUtil;
 import dev.kir.sync.util.WorldUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.DeathScreen;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.network.encryption.PlayerPublicKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -86,8 +86,8 @@ abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity implem
         Direction facing = BlockPosUtil.getHorizontalFacing(pos, world).orElse(this.getHorizontalFacing().getOpposite());
         SynchronizationRequestPacket request = new SynchronizationRequestPacket(state);
         PersistentCameraEntityGoal cameraGoal = this.isDead()
-                ? PersistentCameraEntityGoal.limbo(pos, facing, state.getPos(), __ -> request.send())
-                : PersistentCameraEntityGoal.stairwayToHeaven(pos, facing, state.getPos(), __ -> request.send());
+                ? PersistentCameraEntityGoal.limbo(pos, facing, state.getPos(), __ -> ClientPlayNetworking.send(request))
+                : PersistentCameraEntityGoal.stairwayToHeaven(pos, facing, state.getPos(), __ -> ClientPlayNetworking.send(request));
 
         HudController.hide();
         if (this.isDead()) {

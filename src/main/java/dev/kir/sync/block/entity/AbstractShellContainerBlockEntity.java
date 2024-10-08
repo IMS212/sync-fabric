@@ -10,6 +10,7 @@ import dev.kir.sync.util.ItemUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.DoubleBlockProperties;
 import net.minecraft.block.entity.BlockEntity;
@@ -25,8 +26,8 @@ import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ItemActionResult;
@@ -199,7 +200,10 @@ public abstract class AbstractShellContainerBlockEntity extends BlockEntity impl
     protected void destroyShell(ServerWorld world, BlockPos pos) {
         if (this.shell != null) {
             this.shell.drop(world, pos);
-            new ShellDestroyedPacket(pos).send(PlayerLookup.around(world, pos, 32));
+            ShellDestroyedPacket packet = new ShellDestroyedPacket(pos);
+            for (ServerPlayerEntity player : PlayerLookup.around(world, pos, 32)) {
+                ServerPlayNetworking.send(player, packet);
+            }
             this.shell = null;
         }
     }

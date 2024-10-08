@@ -46,10 +46,10 @@ public class SynchronizationRequestPacket implements CustomPayload {
             Identifier targetWorldId = state.getWorld();
             BlockPos targetPos = state.getPos();
             Direction targetFacing = player.getHorizontalFacing().getOpposite();
-            new SynchronizationResponsePacket(currentWorldId, currentPos, currentFacing, targetWorldId, targetPos, targetFacing, storedState).send(responseSender);
+            responseSender.sendPacket(new SynchronizationResponsePacket(currentWorldId, currentPos, currentFacing, targetWorldId, targetPos, targetFacing, storedState));
         }).ifRight(failureReason -> {
             player.sendMessage(failureReason.toText(), false);
-            new SynchronizationResponsePacket(currentWorldId, currentPos, currentFacing, currentWorldId, currentPos, currentFacing, null).send(responseSender);
+            responseSender.sendPacket(new SynchronizationResponsePacket(currentWorldId, currentPos, currentFacing, currentWorldId, currentPos, currentFacing, null));
         });
     }
 
