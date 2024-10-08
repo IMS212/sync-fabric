@@ -9,8 +9,6 @@ import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Uuids;
@@ -34,7 +32,7 @@ public class SynchronizationRequestPacket implements CustomPayload {
         this.shellUuid = shellUuid;
     }
 
-    public void execute(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PacketSender responseSender) {
+    public void execute(ServerPlayerEntity player, PacketSender responseSender) {
         ServerShell shell = (ServerShell) player;
         ShellState state = shell.getShellStateByUuid(this.shellUuid);
 
