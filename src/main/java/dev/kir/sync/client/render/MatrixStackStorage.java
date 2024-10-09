@@ -1,6 +1,5 @@
 package dev.kir.sync.client.render;
 
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.client.util.math.MatrixStack;
 
 public final class MatrixStackStorage {
@@ -14,7 +13,4 @@ public final class MatrixStackStorage {
         return modelMatrixStack;
     }
 
-    public void onStart(WorldRenderContext context) {
-        ;
-    }
 }
