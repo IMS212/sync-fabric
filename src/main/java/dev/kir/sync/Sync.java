@@ -3,6 +3,7 @@ package dev.kir.sync;
 import dev.kir.sync.block.SyncBlocks;
 import dev.kir.sync.block.entity.SyncBlockEntities;
 import dev.kir.sync.client.render.CustomGameRenderer;
+import dev.kir.sync.client.render.MatrixStackStorage;
 import dev.kir.sync.client.render.SyncRenderers;
 import dev.kir.sync.command.SyncCommands;
 import dev.kir.sync.config.SyncConfig;
@@ -13,6 +14,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
@@ -46,5 +48,6 @@ public class Sync implements ModInitializer, ClientModInitializer {
         CustomGameRenderer.initClient();
         SyncRenderers.initClient();
         SyncPackets.initClient();
+        WorldRenderEvents.START.register(context -> MatrixStackStorage.saveModelMatrixStack(context.matrixStack())); // TODO: WARN: I don't know if this actually works
     }
 }
