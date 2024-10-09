@@ -3,18 +3,11 @@ package dev.kir.sync.compat.origins;
 import dev.kir.sync.api.shell.ShellStateComponent;
 import io.github.apace100.apoli.component.PowerHolderComponent;
 import io.github.apace100.origins.component.OriginComponent;
-import io.github.apace100.origins.networking.ModPackets;
 import io.github.apace100.origins.networking.packet.s2c.OpenChooseOriginScreenS2CPacket;
-import io.github.apace100.origins.origin.Origin;
-import io.github.apace100.origins.origin.OriginLayer;
-import io.github.apace100.origins.origin.OriginLayerManager;
 import io.github.apace100.origins.registry.ModComponents;
-import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -55,11 +48,11 @@ class OriginsShellStateComponent extends ShellStateComponent {
         return nbt == null ? new NbtCompound() : nbt;
     }
 
-    public NbtCompound getPowerHolderComponentNbt() {
+    public NbtCompound getPowerHolderComponentNbt(RegistryWrapper.WrapperLookup lookup) {
         NbtCompound nbt = this.powerHolderComponentNbt;
         if (this.player != null) {
             nbt = new NbtCompound();
-            PowerHolderComponent.KEY.get(this.player).writeToNbt(nbt);
+            PowerHolderComponent.KEY.get(this.player).writeToNbt(nbt, lookup);
         }
         return nbt == null ? new NbtCompound() : nbt;
     }
@@ -72,7 +65,7 @@ class OriginsShellStateComponent extends ShellStateComponent {
         }
 
         this.originComponentNbt = other.getOriginComponentNbt(lookup);
-        this.powerHolderComponentNbt = other.getPowerHolderComponentNbt();
+        this.powerHolderComponentNbt = other.getPowerHolderComponentNbt(lookup);
         this.activated = other.isActivated();
         if (this.player == null) {
             return;
@@ -82,7 +75,7 @@ class OriginsShellStateComponent extends ShellStateComponent {
         if (this.activated) {
             originComponent.readFromNbt(this.originComponentNbt, lookup);
             PowerHolderComponent powerHolderComponent = PowerHolderComponent.KEY.get(this.player);
-            powerHolderComponent.readFromNbt(this.powerHolderComponentNbt);
+            powerHolderComponent.readFromNbt(this.powerHolderComponentNbt, lookup);
             originComponent.sync();
         } else {
             ServerPlayNetworking.send(this.player, new OpenChooseOriginScreenS2CPacket(false));
@@ -100,7 +93,7 @@ class OriginsShellStateComponent extends ShellStateComponent {
     @Override
     protected NbtCompound writeComponentNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         nbt.put("origins", this.getOriginComponentNbt(lookup));
-        nbt.put("powers", this.getPowerHolderComponentNbt());
+        nbt.put("powers", this.getPowerHolderComponentNbt(lookup));
         nbt.putBoolean("activated", this.isActivated());
         return nbt;
     }
