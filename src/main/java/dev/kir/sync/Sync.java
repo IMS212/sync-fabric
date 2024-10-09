@@ -48,6 +48,6 @@ public class Sync implements ModInitializer, ClientModInitializer {
         CustomGameRenderer.initClient();
         SyncRenderers.initClient();
         SyncPackets.initClient();
-        WorldRenderEvents.START.register(context -> MatrixStackStorage.saveModelMatrixStack(context.matrixStack())); // TODO: WARN: I don't know if this actually works
+//        WorldRenderEvents.START.register(context -> MatrixStackStorage.saveModelMatrixStack(context.matrixStack())); // TODO: WARN: I don't know if this actually works
     }
 }
