@@ -8,7 +8,6 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.registry.BuiltinRegistries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
 import net.minecraft.util.Nameable;
@@ -127,7 +126,7 @@ public class SimpleInventory implements Inventory, Nameable {
                 if (!inventory.get(i).isEmpty()) {
                     NbtCompound compound = new NbtCompound();
                     compound.putByte("Slot", (byte)(i + delta));
-                    nbtList.add(inventory.get(i).encode(lookup));
+                    nbtList.add(inventory.get(i).encode(lookup, compound));
                 }
             }
         }
