@@ -344,7 +344,7 @@ public class ShellState {
             .add(String.class, "ownerName", x -> x.ownerName, (x, ownerName) -> x.ownerName = ownerName)
             .add(Float.class, "health", x -> x.health, (x, health) -> x.health = health)
             .add(Integer.class, "gameMode", x -> x.gameMode, (x, gameMode) -> x.gameMode = gameMode)
-            .add(NbtList.class, "inventory", x -> x.inventory.writeNbt(new NbtList(), lookup), (x, inventory) -> { x.inventory = new SimpleInventory(); x.inventory.readNbt(inventory); })
+            .add(NbtList.class, "inventory", x -> x.inventory.writeNbt(new NbtList(), lookup), (x, inventory) -> { x.inventory = new SimpleInventory(); x.inventory.readNbt(inventory, lookup); })
             .add(NbtCompound.class, "components", x -> x.component.writeNbt(new NbtCompound(), lookup), (x, component) -> { x.component = ShellStateComponent.empty(); if (component != null) { x.component.readNbt(component); } })
 
             .add(Integer.class, "foodLevel", x -> x.foodLevel, (x, foodLevel) -> x.foodLevel = foodLevel)

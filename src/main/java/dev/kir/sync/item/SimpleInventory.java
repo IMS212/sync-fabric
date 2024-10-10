@@ -134,7 +134,7 @@ public class SimpleInventory implements Inventory, Nameable {
         return nbtList;
     }
 
-    public void readNbt(NbtList nbtList) {
+    public void readNbt(NbtList nbtList, RegistryWrapper.WrapperLookup lookup) {
         this.main.clear();
         this.armor.clear();
         this.offHand.clear();
@@ -143,7 +143,6 @@ public class SimpleInventory implements Inventory, Nameable {
             NbtCompound nbtCompound = nbtList.getCompound(i);
             int j = nbtCompound.getByte("Slot") & 255;
             // TODO WARN Potentially jank
-            var lookup = BuiltinRegistries.createWrapperLookup();
             ItemStack itemStack = ItemStack.fromNbtOrEmpty(lookup, nbtCompound);
             if (!itemStack.isEmpty()) {
                 if (j < this.main.size()) {
