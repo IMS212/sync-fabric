@@ -52,7 +52,7 @@ public abstract class CCAShellStateComponent extends ShellStateComponent {
     }
 
     @Override
-    protected void readComponentNbt(NbtCompound nbt) {
+    protected void readComponentNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         this.componentNbt = nbt.copy();
     }
 

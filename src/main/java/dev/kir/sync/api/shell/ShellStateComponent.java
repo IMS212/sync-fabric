@@ -43,15 +43,15 @@ public abstract class ShellStateComponent {
      * @param nbt The nbt data.
      */
     @ApiStatus.NonExtendable
-    public void readNbt(NbtCompound nbt) {
-        this.readComponentNbt(nbt.getCompound(this.getId()));
+    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        this.readComponentNbt(nbt.getCompound(this.getId()), lookup);
     }
 
     /**
      * Restores state of the component from the nbt data.
      * @param nbt The nbt data.
      */
-    protected abstract void readComponentNbt(NbtCompound nbt);
+    protected abstract void readComponentNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup);
 
     /**
      * Stores the state of the component to the nbt.
@@ -166,7 +166,7 @@ public abstract class ShellStateComponent {
         public void clone(ShellStateComponent component, RegistryWrapper.WrapperLookup lookup) { }
 
         @Override
-        public void readNbt(NbtCompound nbt) { }
+        public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) { }
 
         @Override
         public NbtCompound writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
@@ -179,7 +179,7 @@ public abstract class ShellStateComponent {
         }
 
         @Override
-        protected void readComponentNbt(NbtCompound nbt) { }
+        protected void readComponentNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) { }
 
         @Override
         protected NbtCompound writeComponentNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
@@ -236,9 +236,9 @@ public abstract class ShellStateComponent {
         }
 
         @Override
-        public void readNbt(NbtCompound nbt) {
+        public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
             for (ShellStateComponent component : this.components) {
-                component.readNbt(nbt);
+                component.readNbt(nbt, lookup);
             }
         }
 
@@ -251,7 +251,7 @@ public abstract class ShellStateComponent {
         }
 
         @Override
-        protected void readComponentNbt(NbtCompound nbt) { }
+        protected void readComponentNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) { }
 
         @Override
         protected NbtCompound writeComponentNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {

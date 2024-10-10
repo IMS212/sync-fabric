@@ -142,7 +142,6 @@ public class SimpleInventory implements Inventory, Nameable {
         for(int i = 0; i < nbtList.size(); ++i) {
             NbtCompound nbtCompound = nbtList.getCompound(i);
             int j = nbtCompound.getByte("Slot") & 255;
-            // TODO WARN Potentially jank
             ItemStack itemStack = ItemStack.fromNbtOrEmpty(lookup, nbtCompound);
             if (!itemStack.isEmpty()) {
                 if (j < this.main.size()) {
