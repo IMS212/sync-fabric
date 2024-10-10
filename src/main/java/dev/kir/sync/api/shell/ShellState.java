@@ -9,6 +9,7 @@ import dev.kir.sync.util.nbt.NbtSerializerFactory;
 import dev.kir.sync.util.nbt.NbtSerializerFactoryBuilder;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemStack;
@@ -290,8 +291,11 @@ public class ShellState {
 
         ItemEntity item = new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), stack);
         item.setPickupDelay(40);
-       if (world instanceof ServerWorld) {
-           item.setThrower(((ServerWorld) world).getEntity(this.getOwnerUuid()));
+       if (world instanceof ServerWorld serverWorld) {
+           Entity thrower = serverWorld.getEntity(this.getOwnerUuid());
+           if (thrower != null) {
+               item.setThrower(thrower);
+           }
        }
 
         float h = world.random.nextFloat() * 0.5F;
