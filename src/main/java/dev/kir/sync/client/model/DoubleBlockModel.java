@@ -87,7 +87,7 @@ public abstract class DoubleBlockModel extends Model {
     }
 
     public void render(DoubleBlockProperties.Type type, MatrixStack matrices, VertexConsumer vertices, int light, int overlay) {
-        this.render(type, matrices, vertices, light, overlay, 0xFFFFFFFF);
+        this.render(type, matrices, vertices, light, overlay, 0xfefefeff);
     }
 
     public void render(DoubleBlockProperties.Type type, MatrixStack matrices, VertexConsumer vertices, int light, int overlay, int color) {
