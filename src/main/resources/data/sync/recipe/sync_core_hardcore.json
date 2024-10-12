@@ -26,7 +26,7 @@
     }
   },
   "result": {
-    "item": "sync:sync_core"
+    "id": "sync:sync_core"
   },
   "smart_recipes:conditions": "is_hardcore"
 }
