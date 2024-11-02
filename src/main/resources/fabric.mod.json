@@ -7,6 +7,10 @@
   "authors": [
     "Kir_Antipov"
   ],
+  "contributors" : [
+    "skycatminepokie",
+    "cassiancc"
+  ]
   "contact": {
     "website": "https://github.com/Kir-Antipov/sync-fabric",
     "sources": "https://github.com/Kir-Antipov/sync-fabric",
