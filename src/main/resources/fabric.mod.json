@@ -10,7 +10,7 @@
   "contributors" : [
     "skycatminepokie",
     "cassiancc"
-  ]
+  ],
   "contact": {
     "website": "https://github.com/Kir-Antipov/sync-fabric",
     "sources": "https://github.com/Kir-Antipov/sync-fabric",
@@ -55,7 +55,6 @@
     "java": ">=21"
   },
   "includes": {
-    "smart-recipes": "${smart_recipes}",
     "crowdin-translate": "${crowdin_translate}",
     "team_reborn_energy": "${team_reborn_energy}"
   },

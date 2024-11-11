@@ -107,7 +107,6 @@ dependencies {
     //modImplementation(include("de.guntram.mcmod:crowdin-translate:${project.crowdin_translate_version}"))
     modImplementation(include("teamreborn:energy:${project.tr_energy_version}"))
     modImplementation(include("org.ladysnake:satin:${project.satin_version}"))
-    modImplementation(include(files("run/mods/smart-recipes-0.2.1+1.21.1+rev.497f7d8.jar"))) // TODO: Use actual smartrecipes, this is just for testing
 
     modApi("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_version}")
     modCompileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
@@ -124,7 +123,6 @@ processResources {
             "version": version,
             "fabric": ">=${loaderDependencyVersion}",
             "minecraft": ">=${minecraftDependencyVersion}",
-            "smart_recipes": project.smartrecipes_version,
             "satin_api": project.satin_version,
             "crowdin_translate": project.crowdin_translate_version,
             "team_reborn_energy": project.tr_energy_version,
