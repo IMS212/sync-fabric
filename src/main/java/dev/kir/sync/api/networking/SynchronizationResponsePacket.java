@@ -8,7 +8,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtSizeTracker;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.util.Identifier;
@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class SynchronizationResponsePacket implements CustomPayload {
     public static final CustomPayload.Id<SynchronizationResponsePacket> ID = new CustomPayload.Id<>(Sync.locate("packet.shell.synchronization.response"));
-    public static final PacketCodec<PacketByteBuf, SynchronizationResponsePacket> CODEC = PacketCodec.of(SynchronizationResponsePacket::write, SynchronizationResponsePacket::new);
+    public static final PacketCodec<RegistryByteBuf, SynchronizationResponsePacket> CODEC = PacketCodec.of(SynchronizationResponsePacket::write, SynchronizationResponsePacket::new);
     private Identifier startWorld;
     private BlockPos startPos;
     private Direction startFacing;
@@ -37,7 +37,7 @@ public class SynchronizationResponsePacket implements CustomPayload {
         this.storedState = storedState;
     }
 
-    public SynchronizationResponsePacket(PacketByteBuf byteBuf) {
+    public SynchronizationResponsePacket(RegistryByteBuf byteBuf) {
         read(byteBuf);
     }
 
@@ -46,7 +46,7 @@ public class SynchronizationResponsePacket implements CustomPayload {
         return ID;
     }
 
-    public void write(PacketByteBuf buffer) {
+    public void write(RegistryByteBuf buffer) {
         buffer.writeIdentifier(this.startWorld);
         buffer.writeBlockPos(this.startPos);
         buffer.writeVarInt(this.startFacing.getId());
@@ -57,18 +57,18 @@ public class SynchronizationResponsePacket implements CustomPayload {
             buffer.writeBoolean(false);
         } else {
             buffer.writeBoolean(true);
-            buffer.writeNbt(this.storedState.writeNbt(new NbtCompound()));
+            buffer.writeNbt(this.storedState.writeNbt(new NbtCompound(), buffer.getRegistryManager()));
         }
     }
 
-    public void read(PacketByteBuf buffer) {
+    public void read(RegistryByteBuf buffer) {
         this.startWorld = buffer.readIdentifier();
         this.startPos = buffer.readBlockPos();
         this.startFacing = Direction.byId(buffer.readVarInt());
         this.targetWorld = buffer.readIdentifier();
         this.targetPos = buffer.readBlockPos();
         this.targetFacing = Direction.byId(buffer.readVarInt());
-        this.storedState = buffer.readBoolean() ? ShellState.fromNbt((NbtCompound) buffer.readNbt(NbtSizeTracker.ofUnlimitedBytes())) : null;
+        this.storedState = buffer.readBoolean() ? ShellState.fromNbt((NbtCompound) buffer.readNbt(NbtSizeTracker.ofUnlimitedBytes()), buffer.getRegistryManager()) : null;
     }
 
     public Identifier getTargetWorldId() {

@@ -10,8 +10,10 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtSizeTracker;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -19,7 +21,7 @@ import net.minecraft.util.math.MathHelper;
 import java.util.UUID;
 
 public class ShellStateUpdatePacket implements CustomPayload {
-    public static final PacketCodec<PacketByteBuf, ShellStateUpdatePacket> CODEC = PacketCodec.of(ShellStateUpdatePacket::write, ShellStateUpdatePacket::new);
+    public static final PacketCodec<RegistryByteBuf, ShellStateUpdatePacket> CODEC = PacketCodec.of(ShellStateUpdatePacket::write, ShellStateUpdatePacket::new);
     public static final CustomPayload.Id<ShellStateUpdatePacket> ID = new CustomPayload.Id<>(Sync.locate("packet.shell.state.update"));
     private ShellStateUpdateType type;
     private ShellState shellState;
@@ -33,15 +35,15 @@ public class ShellStateUpdatePacket implements CustomPayload {
         this.shellState = shellState;
     }
 
-    public ShellStateUpdatePacket(PacketByteBuf byteBuf) {
-        read(byteBuf);
+    public ShellStateUpdatePacket(RegistryByteBuf byteBuf) {
+        read(byteBuf, byteBuf.getRegistryManager());
     }
 
     public Id<? extends CustomPayload> getId() {
         return ID;
     }
 
-    public void write(PacketByteBuf buffer) {
+    public void write(RegistryByteBuf buffer) {
         if (this.shellState == null && this.type != ShellStateUpdateType.NONE) {
             throw new IllegalStateException();
         }
@@ -49,7 +51,7 @@ public class ShellStateUpdatePacket implements CustomPayload {
         buffer.writeEnumConstant(type);
         switch (type) {
             case ADD:
-                buffer.writeNbt(this.shellState.writeNbt(new NbtCompound()));
+                buffer.writeNbt(this.shellState.writeNbt(new NbtCompound(), buffer.getRegistryManager()));
                 break;
 
             case REMOVE:
@@ -68,11 +70,11 @@ public class ShellStateUpdatePacket implements CustomPayload {
         }
     }
 
-    public void read(PacketByteBuf buffer) {
+    public void read(PacketByteBuf buffer, RegistryWrapper.WrapperLookup lookup) {
         this.type = buffer.readEnumConstant(ShellStateUpdateType.class);
         switch (this.type) {
             case ADD:
-                this.shellState = ShellState.fromNbt((NbtCompound) buffer.readNbt(NbtSizeTracker.ofUnlimitedBytes()));
+                this.shellState = ShellState.fromNbt((NbtCompound) buffer.readNbt(NbtSizeTracker.ofUnlimitedBytes()), lookup);
                 break;
 
             case REMOVE:

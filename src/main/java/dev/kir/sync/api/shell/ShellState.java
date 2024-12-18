@@ -15,7 +15,6 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.registry.BuiltinRegistries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -64,7 +63,6 @@ public class ShellState {
 
     private Identifier world;
     private BlockPos pos;
-    private static final RegistryWrapper.WrapperLookup lookup = BuiltinRegistries.createWrapperLookup();
 
     private final NbtSerializer<ShellState> serializer;
 
@@ -209,9 +207,9 @@ public class ShellState {
      * @param nbt The nbt data.
      * @return Shell created from the nbt data.
      */
-    public static ShellState fromNbt(NbtCompound nbt) {
+    public static ShellState fromNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         ShellState state = new ShellState();
-        state.readNbt(nbt);
+        state.readNbt(nbt, lookup);
         return state;
     }
 
@@ -305,12 +303,12 @@ public class ShellState {
     }
 
 
-    public NbtCompound writeNbt(NbtCompound nbt) {
-        return this.serializer.writeNbt(nbt);
+    public NbtCompound writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        return this.serializer.writeNbt(nbt, lookup);
     }
 
-    public void readNbt(NbtCompound nbt) {
-        this.serializer.readNbt(nbt);
+    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        this.serializer.readNbt(nbt, lookup);
     }
 
 
@@ -339,28 +337,28 @@ public class ShellState {
 
     static {
         NBT_SERIALIZER_FACTORY = new NbtSerializerFactoryBuilder<ShellState>()
-            .add(UUID.class, "uuid", x -> x.uuid, (x, uuid) -> x.uuid = uuid)
-            .add(Integer.class, "color", x -> x.color == null ? -1 : x.color.getId(), (x, color) -> x.color = color == -1 ? null : DyeColor.byId(color))
-            .add(Float.class, "progress", x -> x.progress, (x, progress) -> x.progress = progress)
-            .add(Boolean.class, "isArtificial", x -> x.isArtificial, (x, isArtificial) -> x.isArtificial = isArtificial)
+            .add(UUID.class, "uuid", (x, wrapperLookup) -> x.uuid, (x, uuid, wrapperLookup) -> x.uuid = uuid)
+            .add(Integer.class, "color", (x, wrapperLookup) -> x.color == null ? -1 : x.color.getId(), (x, color, wrapperLookup) -> x.color = color == -1 ? null : DyeColor.byId(color))
+            .add(Float.class, "progress", (x, wrapperLookup) -> x.progress, (x, progress, wrapperLookup) -> x.progress = progress)
+            .add(Boolean.class, "isArtificial", (x, wrapperLookup) -> x.isArtificial, (x, isArtificial, wrapperLookup) -> x.isArtificial = isArtificial)
 
-            .add(UUID.class, "ownerUuid", x -> x.ownerUuid, (x, ownerUuid) -> x.ownerUuid = ownerUuid)
-            .add(String.class, "ownerName", x -> x.ownerName, (x, ownerName) -> x.ownerName = ownerName)
-            .add(Float.class, "health", x -> x.health, (x, health) -> x.health = health)
-            .add(Integer.class, "gameMode", x -> x.gameMode, (x, gameMode) -> x.gameMode = gameMode)
-            .add(NbtList.class, "inventory", x -> x.inventory.writeNbt(new NbtList(), lookup), (x, inventory) -> { x.inventory = new SimpleInventory(); x.inventory.readNbt(inventory, lookup); })
-            .add(NbtCompound.class, "components", x -> x.component.writeNbt(new NbtCompound(), lookup), (x, component) -> { x.component = ShellStateComponent.empty(); if (component != null) { x.component.readNbt(component, lookup); } })
+            .add(UUID.class, "ownerUuid", (x, wrapperLookup) -> x.ownerUuid, (x, ownerUuid, wrapperLookup) -> x.ownerUuid = ownerUuid)
+            .add(String.class, "ownerName", (x, wrapperLookup) -> x.ownerName, (x, ownerName, wrapperLookup) -> x.ownerName = ownerName)
+            .add(Float.class, "health", (x, wrapperLookup) -> x.health, (x, health, wrapperLookup) -> x.health = health)
+            .add(Integer.class, "gameMode", (x, wrapperLookup) -> x.gameMode, (x, gameMode, wrapperLookup) -> x.gameMode = gameMode)
+            .add(NbtList.class, "inventory", (x, wrapperLookup) -> x.inventory.writeNbt(new NbtList(), wrapperLookup), (x, inventory, wrapperLookup) -> { x.inventory = new SimpleInventory(); x.inventory.readNbt(inventory, wrapperLookup); })
+            .add(NbtCompound.class, "components", (x, wrapperLookup) -> x.component.writeNbt(new NbtCompound(), wrapperLookup), (x, component, wrapperLookup) -> { x.component = ShellStateComponent.empty(); if (component != null) { x.component.readNbt(component, wrapperLookup); } })
 
-            .add(Integer.class, "foodLevel", x -> x.foodLevel, (x, foodLevel) -> x.foodLevel = foodLevel)
-            .add(Float.class, "saturationLevel", x -> x.saturationLevel, (x, saturationLevel) -> x.saturationLevel = saturationLevel)
-            .add(Float.class, "exhaustion", x -> x.exhaustion, (x, exhaustion) -> x.exhaustion = exhaustion)
+            .add(Integer.class, "foodLevel", (x, wrapperLookup) -> x.foodLevel, (x, foodLevel, wrapperLookup) -> x.foodLevel = foodLevel)
+            .add(Float.class, "saturationLevel", (x, wrapperLookup) -> x.saturationLevel, (x, saturationLevel, wrapperLookup) -> x.saturationLevel = saturationLevel)
+            .add(Float.class, "exhaustion", (x, wrapperLookup) -> x.exhaustion, (x, exhaustion, wrapperLookup) -> x.exhaustion = exhaustion)
 
-            .add(Integer.class, "experienceLevel", x -> x.experienceLevel, (x, experienceLevel) -> x.experienceLevel = experienceLevel)
-            .add(Float.class, "experienceProgress", x -> x.experienceProgress, (x, experienceProgress) -> x.experienceProgress = experienceProgress)
-            .add(Integer.class, "totalExperience", x -> x.totalExperience, (x, totalExperience) -> x.totalExperience = totalExperience)
+            .add(Integer.class, "experienceLevel", (x, wrapperLookup) -> x.experienceLevel, (x, experienceLevel, wrapperLookup) -> x.experienceLevel = experienceLevel)
+            .add(Float.class, "experienceProgress", (x, wrapperLookup) -> x.experienceProgress, (x, experienceProgress, wrapperLookup) -> x.experienceProgress = experienceProgress)
+            .add(Integer.class, "totalExperience", (x, wrapperLookup) -> x.totalExperience, (x, totalExperience, wrapperLookup) -> x.totalExperience = totalExperience)
 
-            .add(Identifier.class, "world", x -> x.world, (x, world) -> x.world = world)
-            .add(BlockPos.class, "pos", x -> x.pos, (x, pos) -> x.pos = pos)
+            .add(Identifier.class, "world", (x, wrapperLookup) -> x.world, (x, world, wrapperLookup) -> x.world = world)
+            .add(BlockPos.class, "pos", (x, wrapperLookup) -> x.pos, (x, pos, wrapperLookup) -> x.pos = pos)
             .build();
     }
 }

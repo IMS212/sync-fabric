@@ -242,7 +242,7 @@ public abstract class AbstractShellContainerBlockEntity extends BlockEntity impl
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         super.writeNbt(nbt, lookup);
         if (this.shell != null) {
-            nbt.put("shell", this.shell.writeNbt(new NbtCompound()));
+            nbt.put("shell", this.shell.writeNbt(new NbtCompound(), lookup));
         }
         nbt.putInt("color", this.color == null ? -1 : this.color.getId());
     }
@@ -250,7 +250,7 @@ public abstract class AbstractShellContainerBlockEntity extends BlockEntity impl
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         super.readNbt(nbt, lookup);
-        this.shell = nbt.contains("shell") ? ShellState.fromNbt(nbt.getCompound("shell")) : null;
+        this.shell = nbt.contains("shell") ? ShellState.fromNbt(nbt.getCompound("shell"), lookup) : null;
         int colorId = nbt.contains("color", NbtElement.INT_TYPE) ? nbt.getInt("color") : -1;
         this.color = colorId == -1 ? null : DyeColor.byId(colorId);
     }

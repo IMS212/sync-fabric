@@ -2,20 +2,19 @@ package dev.kir.sync.util.nbt;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.*;
-import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 public class NbtSerializerFactoryBuilder<TTarget> {
     private static final Map<Class<?>, BiFunction<NbtCompound, String, ?>> NBT_GETTERS;
     private static final Map<Class<?>, TriConsumer<NbtCompound, String, ?>> NBT_SETTERS;
 
-    private final Collection<BiConsumer<TTarget, NbtCompound>> readers;
-    private final Collection<BiConsumer<TTarget, NbtCompound>> writers;
+    private final Collection<org.apache.commons.lang3.function.TriConsumer<TTarget, NbtCompound, RegistryWrapper.WrapperLookup>> readers;
+    private final Collection<org.apache.commons.lang3.function.TriConsumer<TTarget, NbtCompound, RegistryWrapper.WrapperLookup>> writers;
 
     public NbtSerializerFactoryBuilder() {
         this.readers = new ArrayList<>();
@@ -23,13 +22,13 @@ public class NbtSerializerFactoryBuilder<TTarget> {
     }
 
     @SuppressWarnings("unchecked")
-    public <TProperty> NbtSerializerFactoryBuilder<TTarget> add(Class<TProperty> type, String key, Function<TTarget, TProperty> getter, BiConsumer<TTarget, TProperty> setter) {
+    public <TProperty> NbtSerializerFactoryBuilder<TTarget> add(Class<TProperty> type, String key, BiFunction<TTarget, RegistryWrapper.WrapperLookup, TProperty> getter, org.apache.commons.lang3.function.TriConsumer<TTarget, TProperty, RegistryWrapper.WrapperLookup> setter) {
         if (getter != null) {
             TriConsumer<NbtCompound, String, TProperty> nbtSetter = (TriConsumer<NbtCompound, String, TProperty>)NBT_SETTERS.get(type);
             if (nbtSetter == null) {
                 throw new UnsupportedOperationException();
             }
-            this.writers.add((i, x) -> nbtSetter.accept(x, key, getter.apply(i)));
+            this.writers.add((i, x, lookup) -> nbtSetter.accept(x, key, getter.apply(i, lookup)));
         }
 
         if (setter != null) {
@@ -37,7 +36,7 @@ public class NbtSerializerFactoryBuilder<TTarget> {
             if (nbtGetter == null) {
                 throw new UnsupportedOperationException();
             }
-            this.readers.add((i, x) -> setter.accept(i, nbtGetter.apply(x, key)));
+            this.readers.add((i, x, lookup) -> setter.accept(i, nbtGetter.apply(x, key), lookup));
         }
 
         return this;

@@ -385,7 +385,7 @@ abstract class ServerPlayerEntityMixin extends PlayerEntity implements ServerShe
         this.shellsById
             .values()
             .stream()
-            .map(x -> x.writeNbt(new NbtCompound()))
+            .map(x -> x.writeNbt(new NbtCompound(), getServerWorld().getRegistryManager()))
             .forEach(shellList::add);
 
         nbt.putBoolean("IsArtificial", this.isArtificial);
@@ -397,7 +397,7 @@ abstract class ServerPlayerEntityMixin extends PlayerEntity implements ServerShe
         this.isArtificial = nbt.getBoolean("IsArtificial");
         this.shellsById = nbt.getList("Shells", NbtElement.COMPOUND_TYPE)
             .stream()
-            .map(x -> ShellState.fromNbt((NbtCompound)x))
+            .map(x -> ShellState.fromNbt((NbtCompound)x, getServerWorld().getRegistryManager()))
             .collect(Collectors.toConcurrentMap(ShellState::getUuid, x -> x));
 
         Collection<Pair<ShellStateUpdateType, ShellState>> updates = ((ShellStateManager)this.server).popPendingUpdates(this.uuid);

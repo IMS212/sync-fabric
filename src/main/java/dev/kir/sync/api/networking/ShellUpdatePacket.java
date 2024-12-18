@@ -12,6 +12,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Identifier;
 
 import java.util.Collection;
@@ -30,8 +31,8 @@ public class ShellUpdatePacket implements CustomPayload {
         this.states = states == null ? List.of() : states;
     }
 
-    public ShellUpdatePacket(PacketByteBuf byteBuf) {
-        read(byteBuf);
+    public ShellUpdatePacket(RegistryByteBuf byteBuf) {
+        read(byteBuf, byteBuf.getRegistryManager());
     }
 
     @Override
@@ -39,17 +40,17 @@ public class ShellUpdatePacket implements CustomPayload {
         return ID;
     }
 
-    public void write(PacketByteBuf buffer) {
+    public void write(RegistryByteBuf buffer) {
         buffer.writeIdentifier(this.worldId);
         buffer.writeBoolean(this.isArtificial);
         buffer.writeVarInt(this.states.size());
-        this.states.forEach(x -> buffer.writeNbt(x.writeNbt(new NbtCompound())));
+        this.states.forEach(x -> buffer.writeNbt(x.writeNbt(new NbtCompound(), buffer.getRegistryManager())));
     }
 
-    public void read(PacketByteBuf buffer) {
+    public void read(PacketByteBuf buffer, RegistryWrapper.WrapperLookup lookup) {
         this.worldId = buffer.readIdentifier();
         this.isArtificial = buffer.readBoolean();
-        this.states = buffer.readList(subBuffer -> ShellState.fromNbt((NbtCompound) subBuffer.readNbt(NbtSizeTracker.ofUnlimitedBytes())));
+        this.states = buffer.readList(subBuffer -> ShellState.fromNbt((NbtCompound) subBuffer.readNbt(NbtSizeTracker.ofUnlimitedBytes()), lookup));
     }
 
     public Identifier getTargetWorldId() {

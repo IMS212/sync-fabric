@@ -8,6 +8,8 @@ import dev.kir.sync.api.shell.ShellStateUpdateType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.ReloadableRegistries;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.util.Pair;
@@ -28,6 +30,10 @@ import java.util.stream.Stream;
 abstract class MinecraftServerMixin implements ShellStateManager {
     @Shadow
     private PlayerManager playerManager;
+
+    @Shadow public abstract ReloadableRegistries.Lookup getReloadableRegistries();
+
+    @Shadow public abstract DynamicRegistryManager.Immutable getRegistryManager();
 
     @Unique
     private final ConcurrentMap<UUID, ConcurrentMap<UUID, Pair<ShellStateUpdateType, ShellState>>> pendingShellStates = new ConcurrentHashMap<>();
@@ -107,7 +113,7 @@ abstract class MinecraftServerMixin implements ShellStateManager {
                 Map<UUID, ShellState> shells = nbt
                         .getList("Shells", NbtElement.COMPOUND_TYPE)
                         .stream()
-                        .map(x -> ShellState.fromNbt((NbtCompound)x))
+                        .map(x -> ShellState.fromNbt((NbtCompound)x, getRegistryManager()))
                         .collect(Collectors.toMap(ShellState::getUuid, x -> x));
 
                 for (Pair<ShellStateUpdateType, ShellState> update : updates) {
@@ -123,7 +129,7 @@ abstract class MinecraftServerMixin implements ShellStateManager {
                 }
 
                 NbtList shellList = new NbtList();
-                shells.values().stream().map(x -> x.writeNbt(new NbtCompound())).forEach(shellList::add);
+                shells.values().stream().map(x -> x.writeNbt(new NbtCompound(), getRegistryManager())).forEach(shellList::add);
                 nbt.put("Shells", shellList);
             });
         }

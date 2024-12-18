@@ -2,14 +2,14 @@ package dev.kir.sync.util.nbt;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.nbt.NbtCompound;
-
-import java.util.function.BiConsumer;
+import net.minecraft.registry.RegistryWrapper;
+import org.apache.commons.lang3.function.TriConsumer;
 
 public class NbtSerializerFactory<T> {
-    private final Iterable<BiConsumer<T, NbtCompound>> readers;
-    private final Iterable<BiConsumer<T, NbtCompound>> writers;
+    private final Iterable<TriConsumer<T, NbtCompound, RegistryWrapper.WrapperLookup>> readers;
+    private final Iterable<TriConsumer<T, NbtCompound, RegistryWrapper.WrapperLookup>> writers;
 
-    public NbtSerializerFactory(Iterable<BiConsumer<T, NbtCompound>> readers, Iterable<BiConsumer<T, NbtCompound>> writers) {
+    public NbtSerializerFactory(Iterable<TriConsumer<T, NbtCompound, RegistryWrapper.WrapperLookup>> readers, Iterable<TriConsumer<T, NbtCompound, RegistryWrapper.WrapperLookup>> writers) {
         this.readers = ImmutableList.copyOf(readers);
         this.writers = ImmutableList.copyOf(writers);
     }
