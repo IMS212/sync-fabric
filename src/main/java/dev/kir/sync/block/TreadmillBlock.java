@@ -146,7 +146,7 @@ public class TreadmillBlock extends HorizontalFacingBlock implements BlockEntity
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
+    public boolean canPathfindThrough(BlockState state, NavigationType type) {
         return true;
     }
 

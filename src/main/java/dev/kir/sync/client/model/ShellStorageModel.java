@@ -1,5 +1,6 @@
 package dev.kir.sync.client.model;
 
+import dev.kir.sync.util.client.render.ColorUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.DoubleBlockProperties;
@@ -148,12 +149,11 @@ public class ShellStorageModel extends AbstractShellContainerModel {
     }
 
     @Override
-    public void render(DoubleBlockProperties.Type type, MatrixStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {
+    public void render(DoubleBlockProperties.Type type, MatrixStack matrices, VertexConsumer vertices, int light, int overlay, int color) {
         this.headConnector.pivotZ = 10 - 5 * this.connectorProgress;
-        super.render(type, matrices, vertices, light, overlay, red, green, blue, alpha);
+        super.render(type, matrices, vertices, light, overlay, color);
         if (type == BOTTOM) {
-            float[] rgb = this.ledColor.getColorComponents();
-            this.ledLight.render(matrices, vertices, light, overlay, rgb[0], rgb[1], rgb[2], 1F);
+            this.ledLight.render(matrices, vertices, light, overlay, ColorUtil.fromDyeColor(this.ledColor, 1F));
         }
     }
 }

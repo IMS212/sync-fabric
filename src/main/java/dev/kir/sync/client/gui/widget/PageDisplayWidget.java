@@ -5,7 +5,6 @@ import dev.kir.sync.util.client.render.RenderSystemUtil;
 import dev.kir.sync.util.math.Radians;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.MathHelper;
@@ -20,7 +19,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class PageDisplayWidget<TKey, UData> extends AbstractWidget {
-    private static final int DEFAULT_TEXT_COLOR = ColorUtil.fromDyeColor(DyeColor.WHITE);
+    private static final int DEFAULT_TEXT_COLOR = DyeColor.WHITE.getEntityColor();
     private static final int DEFAULT_BACKGROUND_COLOR = ColorUtil.fromDyeColor(DyeColor.BLACK, 0.6F);
     private static final float DEFAULT_SCALE = 1F;
     private static final float DEFAULT_STEP = Radians.R_PI_32;

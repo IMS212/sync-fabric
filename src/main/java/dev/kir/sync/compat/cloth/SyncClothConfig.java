@@ -67,7 +67,7 @@ public class SyncClothConfig implements SyncConfig, ConfigData {
     @ConfigEntry.Category(value = "energy")
     @ConfigEntry.Gui.Tooltip(count = 2)
     @ConfigEntry.Gui.RequiresRestart
-    public List<EnergyMapEntry> energyMap = SyncConfig.super.energyMap().stream().map(x -> new EnergyMapEntry(x.entityId(), x.outputEnergyQuantity())).collect(Collectors.toCollection(ArrayList::new));
+    public List<dev.kir.sync.compat.cloth.SyncClothConfig.EnergyMapEntry> energyMap = SyncConfig.super.energyMap().stream().map(x -> new dev.kir.sync.compat.cloth.SyncClothConfig.EnergyMapEntry(x.entityId(), x.outputEnergyQuantity())).collect(Collectors.toCollection(ArrayList::new));
 
     @ConfigEntry.Category(value = "sync")
     @ConfigEntry.Gui.Tooltip

@@ -30,6 +30,6 @@ public final class IrisRenderLayer extends RenderLayer {
     }
 
     static {
-        VOXELS = RenderLayer.getEntitySolid(new Identifier("textures/block/white_concrete.png"));
+        VOXELS = RenderLayer.getEntitySolid(Identifier.ofVanilla("textures/block/white_concrete.png"));
     }
 }

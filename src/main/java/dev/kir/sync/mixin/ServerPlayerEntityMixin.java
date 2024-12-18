@@ -10,6 +10,8 @@ import dev.kir.sync.api.shell.*;
 import dev.kir.sync.entity.KillableEntity;
 import dev.kir.sync.util.BlockPosUtil;
 import dev.kir.sync.util.WorldUtil;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
@@ -18,9 +20,8 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.network.PacketCallbacks;
-import net.minecraft.network.encryption.PlayerPublicKey;
-import net.minecraft.network.packet.c2s.play.TeleportConfirmC2SPacket;
 import net.minecraft.network.packet.s2c.play.*;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.scoreboard.AbstractTeam;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
@@ -112,7 +113,7 @@ abstract class ServerPlayerEntityMixin extends PlayerEntity implements ServerShe
     }
 
     @Override
-    public Either<ShellState, PlayerSyncEvents.SyncFailureReason> sync(ShellState state) {
+    public Either<ShellState, PlayerSyncEvents.SyncFailureReason> sync(ShellState state, RegistryWrapper.WrapperLookup lookup) {
         ServerPlayerEntity player = (ServerPlayerEntity)(Object)this;
         BlockPos currentPos = this.getBlockPos();
         World currentWorld = player.getWorld();
@@ -155,7 +156,7 @@ abstract class ServerPlayerEntityMixin extends PlayerEntity implements ServerShe
 
         ShellState storedState = null;
         if (currentShellContainer != null) {
-            storedState = ShellState.of(player, currentPos, currentShellContainer.getColor());
+            storedState = ShellState.of(player, currentPos, currentShellContainer.getColor(), lookup);
             currentShellContainer.setShellState(storedState);
             if (currentShellContainer.isRemotelyAccessible()) {
                 this.add(storedState);
@@ -164,14 +165,14 @@ abstract class ServerPlayerEntityMixin extends PlayerEntity implements ServerShe
 
         targetShellContainer.setShellState(null);
         this.remove(state);
-        this.apply(state);
+        this.apply(state, lookup);
 
         PlayerSyncEvents.STOP_SYNCING.invoker().onStopSyncing(player, currentPos, storedState);
         return Either.left(storedState);
     }
 
     @Override
-    public void apply(ShellState state) {
+    public void apply(ShellState state, RegistryWrapper.WrapperLookup lookup) {
         Objects.requireNonNull(state);
 
         ServerPlayerEntity serverPlayer = (ServerPlayerEntity)(Object)this;
@@ -188,7 +189,9 @@ abstract class ServerPlayerEntityMixin extends PlayerEntity implements ServerShe
         this.setOnFire(false);
         this.clearStatusEffects();
 
-        new PlayerIsAlivePacket(serverPlayer).sendToAll(server);
+        for (var player : PlayerLookup.all(server)) {
+            ServerPlayNetworking.send(player, new PlayerIsAlivePacket(serverPlayer.getUuid()));
+        }
         this.teleport(targetWorld, state.getPos());
         this.isArtificial = state.isArtificial();
 
@@ -198,7 +201,7 @@ abstract class ServerPlayerEntityMixin extends PlayerEntity implements ServerShe
         inventory.selectedSlot = selectedSlot;
 
         ShellStateComponent playerComponent = ShellStateComponent.of(serverPlayer);
-        playerComponent.clone(state.getComponent());
+        playerComponent.clone(state.getComponent(), lookup);
 
         serverPlayer.changeGameMode(GameMode.byId(state.getGameMode()));
         this.setHealth(state.getHealth());
@@ -278,11 +281,11 @@ abstract class ServerPlayerEntityMixin extends PlayerEntity implements ServerShe
         if (this.shellDirty) {
             this.shellDirty = false;
             this.shellStateChanges.clear();
-            new ShellUpdatePacket(WorldUtil.getId(this.getWorld()), this.isArtificial, this.shellsById.values()).send(player);
+            ServerPlayNetworking.send(player, new ShellUpdatePacket(WorldUtil.getId(this.getWorld()), this.isArtificial, this.shellsById.values()));
         }
 
         for (Pair<ShellStateUpdateType, ShellState> upd : this.shellStateChanges.values()) {
-            new ShellStateUpdatePacket(upd.getLeft(), upd.getRight()).send(player);
+            ServerPlayNetworking.send(player, new ShellStateUpdatePacket(upd.getLeft(), upd.getRight()));
         }
         this.shellStateChanges.clear();
     }
@@ -310,7 +313,7 @@ abstract class ServerPlayerEntityMixin extends PlayerEntity implements ServerShe
         }
 
         if (!this.isSpectator()) {
-            this.drop(source);
+            this.drop(getServerWorld(), source);
         }
 
         this.undead = true;
@@ -382,7 +385,7 @@ abstract class ServerPlayerEntityMixin extends PlayerEntity implements ServerShe
         this.shellsById
             .values()
             .stream()
-            .map(x -> x.writeNbt(new NbtCompound()))
+            .map(x -> x.writeNbt(new NbtCompound(), getServerWorld().getRegistryManager()))
             .forEach(shellList::add);
 
         nbt.putBoolean("IsArtificial", this.isArtificial);
@@ -394,7 +397,7 @@ abstract class ServerPlayerEntityMixin extends PlayerEntity implements ServerShe
         this.isArtificial = nbt.getBoolean("IsArtificial");
         this.shellsById = nbt.getList("Shells", NbtElement.COMPOUND_TYPE)
             .stream()
-            .map(x -> ShellState.fromNbt((NbtCompound)x))
+            .map(x -> ShellState.fromNbt((NbtCompound)x, getServerWorld().getRegistryManager()))
             .collect(Collectors.toConcurrentMap(ShellState::getUuid, x -> x));
 
         Collection<Pair<ShellStateUpdateType, ShellState>> updates = ((ShellStateManager)this.server).popPendingUpdates(this.uuid);
@@ -450,21 +453,21 @@ abstract class ServerPlayerEntityMixin extends PlayerEntity implements ServerShe
         ServerPlayerEntity serverPlayer = (ServerPlayerEntity)(Object)this;
 
         WorldProperties worldProperties = targetWorld.getLevelProperties();
-        serverPlayer.networkHandler.sendPacket(new PlayerRespawnS2CPacket(new CommonPlayerSpawnInfo(targetWorld.getDimensionKey(), targetWorld.getRegistryKey(), BiomeAccess.hashSeed(targetWorld.getSeed()), serverPlayer.interactionManager.getGameMode(), serverPlayer.interactionManager.getPreviousGameMode(), targetWorld.isDebugWorld(), targetWorld.isFlat(), this.getLastDeathPos(), this.getId()), (byte) 3));
+        serverPlayer.networkHandler.sendPacket(new PlayerRespawnS2CPacket(new CommonPlayerSpawnInfo(targetWorld.getDimensionEntry(), targetWorld.getRegistryKey(), BiomeAccess.hashSeed(targetWorld.getSeed()), serverPlayer.interactionManager.getGameMode(), serverPlayer.interactionManager.getPreviousGameMode(), targetWorld.isDebugWorld(), targetWorld.isFlat(), this.getLastDeathPos(), this.getId()), (byte) 3));
         serverPlayer.networkHandler.sendPacket(new DifficultyS2CPacket(worldProperties.getDifficulty(), worldProperties.isDifficultyLocked()));
         PlayerManager playerManager = Objects.requireNonNull(this.getWorld().getServer()).getPlayerManager();
         playerManager.sendCommandTree(serverPlayer);
         serverWorld.removePlayer(serverPlayer, RemovalReason.CHANGED_DIMENSION);
         this.unsetRemoved();
         serverPlayer.setWorld(targetWorld);
-        targetWorld.onPlayerChangeDimension(serverPlayer);
+        targetWorld.onDimensionChanged(serverPlayer);
         this.networkHandler.requestTeleport(x, y, z, yaw, pitch);
         this.worldChanged(targetWorld);
         serverPlayer.networkHandler.sendPacket(new PlayerAbilitiesS2CPacket(serverPlayer.getAbilities()));
         playerManager.sendWorldInfo(serverPlayer, targetWorld);
         playerManager.sendPlayerStatus(serverPlayer);
         for (StatusEffectInstance statusEffectInstance : this.getStatusEffects()) {
-            this.networkHandler.sendPacket(new EntityStatusEffectS2CPacket(this.getId(), statusEffectInstance));
+            this.networkHandler.sendPacket(new EntityStatusEffectS2CPacket(this.getId(), statusEffectInstance, false)); // TODO: Not sure about the keepFading value
         }
         this.onTeleportationDone();
     }

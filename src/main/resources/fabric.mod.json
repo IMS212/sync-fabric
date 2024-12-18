@@ -7,6 +7,10 @@
   "authors": [
     "Kir_Antipov"
   ],
+  "contributors" : [
+    "skycatminepokie",
+    "cassiancc"
+  ],
   "contact": {
     "website": "https://github.com/Kir-Antipov/sync-fabric",
     "sources": "https://github.com/Kir-Antipov/sync-fabric",
@@ -17,8 +21,7 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "dev.kir.sync.Sync",
-      "dev.kir.sync.compat.requiem.RequiemCompat"
+      "dev.kir.sync.Sync"
     ],
     "client": [
       "dev.kir.sync.Sync"
@@ -28,7 +31,6 @@
     ],
     "cardinal-components-entity": [
       "dev.kir.sync.compat.origins.OriginsCompat",
-      "dev.kir.sync.compat.haema.HaemaCompat",
       "dev.kir.sync.compat.trinkets.TrinketsCompat"
     ]
   },
@@ -45,15 +47,14 @@
     }
   },
   "depends": {
-    "fabric": "*",
+    "fabric-api": "*",
     "fabricloader": "${fabric}",
     "satin": "*",
 
     "minecraft": "${minecraft}",
-    "java": ">=16"
+    "java": ">=21"
   },
   "includes": {
-    "smart-recipes": "${smart_recipes}",
     "crowdin-translate": "${crowdin_translate}",
     "team_reborn_energy": "${team_reborn_energy}"
   },
@@ -61,8 +62,6 @@
     "cloth-config": "${cloth_config}",
     "modmenu": "${modmenu}",
     "trinkets": "${trinkets}",
-    "origins": "${origins}",
-    "haema": "${haema}",
-    "requiem": "${requiem}"
+    "origins": "${origins}"
   }
 }

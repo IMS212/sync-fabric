@@ -10,6 +10,7 @@ import dev.kir.sync.util.ItemUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.DoubleBlockProperties;
 import net.minecraft.block.entity.BlockEntity;
@@ -23,11 +24,13 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Hand;
+import net.minecraft.util.ItemActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -197,12 +200,15 @@ public abstract class AbstractShellContainerBlockEntity extends BlockEntity impl
     protected void destroyShell(ServerWorld world, BlockPos pos) {
         if (this.shell != null) {
             this.shell.drop(world, pos);
-            new ShellDestroyedPacket(pos).send(PlayerLookup.around(world, pos, 32));
+            ShellDestroyedPacket packet = new ShellDestroyedPacket(pos);
+            for (ServerPlayerEntity player : PlayerLookup.around(world, pos, 32)) {
+                ServerPlayNetworking.send(player, packet);
+            }
             this.shell = null;
         }
     }
 
-    public abstract ActionResult onUse(World world, BlockPos pos, PlayerEntity player, Hand hand);
+    public abstract ItemActionResult onUse(World world, BlockPos pos, PlayerEntity player, Hand hand);
 
     @Environment(EnvType.CLIENT)
     public float getDoorOpenProgress(float tickDelta) {
@@ -221,9 +227,9 @@ public abstract class AbstractShellContainerBlockEntity extends BlockEntity impl
     }
 
     @Override
-    public NbtCompound toInitialChunkDataNbt() {
-        NbtCompound nbt = super.toInitialChunkDataNbt();
-        this.writeNbt(nbt);
+    public NbtCompound toInitialChunkDataNbt(RegistryWrapper.WrapperLookup lookup) {
+        NbtCompound nbt = super.toInitialChunkDataNbt(lookup);
+        this.writeNbt(nbt, lookup);
         return nbt;
     }
 
@@ -233,18 +239,18 @@ public abstract class AbstractShellContainerBlockEntity extends BlockEntity impl
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        super.writeNbt(nbt, lookup);
         if (this.shell != null) {
-            nbt.put("shell", this.shell.writeNbt(new NbtCompound()));
+            nbt.put("shell", this.shell.writeNbt(new NbtCompound(), lookup));
         }
         nbt.putInt("color", this.color == null ? -1 : this.color.getId());
     }
 
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
-        this.shell = nbt.contains("shell") ? ShellState.fromNbt(nbt.getCompound("shell")) : null;
+    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        super.readNbt(nbt, lookup);
+        this.shell = nbt.contains("shell") ? ShellState.fromNbt(nbt.getCompound("shell"), lookup) : null;
         int colorId = nbt.contains("color", NbtElement.INT_TYPE) ? nbt.getInt("color") : -1;
         this.color = colorId == -1 ? null : DyeColor.byId(colorId);
     }
@@ -280,12 +286,12 @@ public abstract class AbstractShellContainerBlockEntity extends BlockEntity impl
         boolean isArmorSlot = slot >= 0 && slot < armorSize;
         if (isArmorSlot) {
             EquipmentSlot equipmentSlot = ItemUtil.getPreferredEquipmentSlot(stack);
-            return ItemUtil.isArmor(stack) && equipmentSlot.getType() == EquipmentSlot.Type.ARMOR && slot == equipmentSlot.getEntitySlotId();
+            return ItemUtil.isArmor(stack) && equipmentSlot.getType() == EquipmentSlot.Type.HUMANOID_ARMOR && slot == equipmentSlot.getEntitySlotId();
         }
 
         boolean isOffHandSlot = slot >= armorSize && slot < (armorSize + inventory.offHand.size());
         if (isOffHandSlot) {
-            return ItemUtil.getPreferredEquipmentSlot(stack) == EquipmentSlot.OFFHAND || inventory.main.stream().noneMatch(x -> x.isEmpty() || (x.getCount() + stack.getCount()) <= x.getMaxCount() && ItemStack.canCombine(x, stack));
+            return ItemUtil.getPreferredEquipmentSlot(stack) == EquipmentSlot.OFFHAND || inventory.main.stream().noneMatch(x -> x.isEmpty() || (x.getCount() + stack.getCount()) <= x.getMaxCount() && ItemStack.areItemsAndComponentsEqual(x, stack));
         }
 
         return true;

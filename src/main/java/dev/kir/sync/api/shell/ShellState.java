@@ -9,11 +9,13 @@ import dev.kir.sync.util.nbt.NbtSerializerFactory;
 import dev.kir.sync.util.nbt.NbtSerializerFactoryBuilder;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.DyeColor;
@@ -161,8 +163,8 @@ public class ShellState {
      * @param pos Position of the shell.
      * @return Empty shell of the specified player.
      */
-    public static ShellState empty(ServerPlayerEntity player, BlockPos pos) {
-        return empty(player, pos, null);
+    public static ShellState empty(ServerPlayerEntity player, BlockPos pos, RegistryWrapper.WrapperLookup lookup) {
+        return empty(player, pos, null, lookup);
     }
 
     /**
@@ -173,8 +175,8 @@ public class ShellState {
      * @param color Color of the shell.
      * @return Empty shell of the specified player.
      */
-    public static ShellState empty(ServerPlayerEntity player, BlockPos pos, DyeColor color) {
-        return create(player, pos, color, 0, true, false);
+    public static ShellState empty(ServerPlayerEntity player, BlockPos pos, DyeColor color, RegistryWrapper.WrapperLookup lookup) {
+        return create(player, pos, color, 0, true, false, lookup);
     }
 
     /**
@@ -184,8 +186,8 @@ public class ShellState {
      * @param pos Position of the shell.
      * @return Shell that is a full copy of the specified player.
      */
-    public static ShellState of(ServerPlayerEntity player, BlockPos pos) {
-        return of(player, pos, null);
+    public static ShellState of(ServerPlayerEntity player, BlockPos pos, RegistryWrapper.WrapperLookup lookup) {
+        return of(player, pos, null, lookup);
     }
 
     /**
@@ -196,8 +198,8 @@ public class ShellState {
      * @param color Color of the shell.
      * @return Shell that is a full copy of the specified player.
      */
-    public static ShellState of(ServerPlayerEntity player, BlockPos pos, DyeColor color) {
-        return create(player, pos, color, 1, ((Shell)player).isArtificial(), true);
+    public static ShellState of(ServerPlayerEntity player, BlockPos pos, DyeColor color, RegistryWrapper.WrapperLookup lookup) {
+        return create(player, pos, color, 1, ((Shell)player).isArtificial(), true, lookup);
     }
 
     /**
@@ -205,13 +207,13 @@ public class ShellState {
      * @param nbt The nbt data.
      * @return Shell created from the nbt data.
      */
-    public static ShellState fromNbt(NbtCompound nbt) {
+    public static ShellState fromNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         ShellState state = new ShellState();
-        state.readNbt(nbt);
+        state.readNbt(nbt, lookup);
         return state;
     }
 
-    private static ShellState create(ServerPlayerEntity player, BlockPos pos, DyeColor color, float progress, boolean isArtificial, boolean copyPlayerState) {
+    private static ShellState create(ServerPlayerEntity player, BlockPos pos, DyeColor color, float progress, boolean isArtificial, boolean copyPlayerState, RegistryWrapper.WrapperLookup lookup) {
         ShellState shell = new ShellState();
 
         shell.uuid = UUID.randomUUID();
@@ -228,7 +230,7 @@ public class ShellState {
         if (copyPlayerState) {
             shell.health = player.getHealth();
             shell.inventory.clone(player.getInventory());
-            shell.component.clone(ShellStateComponent.of(player));
+            shell.component.clone(ShellStateComponent.of(player), lookup);
 
             shell.foodLevel = player.getHungerManager().getFoodLevel();
             shell.saturationLevel = player.getHungerManager().getSaturationLevel();
@@ -287,8 +289,11 @@ public class ShellState {
 
         ItemEntity item = new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), stack);
         item.setPickupDelay(40);
-       if (world instanceof ServerWorld) {
-           item.setThrower(((ServerWorld) world).getEntity(this.getOwnerUuid()));
+       if (world instanceof ServerWorld serverWorld) {
+           Entity thrower = serverWorld.getEntity(this.getOwnerUuid());
+           if (thrower != null) {
+               item.setThrower(thrower);
+           }
        }
 
         float h = world.random.nextFloat() * 0.5F;
@@ -298,12 +303,12 @@ public class ShellState {
     }
 
 
-    public NbtCompound writeNbt(NbtCompound nbt) {
-        return this.serializer.writeNbt(nbt);
+    public NbtCompound writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        return this.serializer.writeNbt(nbt, lookup);
     }
 
-    public void readNbt(NbtCompound nbt) {
-        this.serializer.readNbt(nbt);
+    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        this.serializer.readNbt(nbt, lookup);
     }
 
 
@@ -319,7 +324,7 @@ public class ShellState {
 
 
     @Environment(EnvType.CLIENT)
-    private ShellEntity entityInstance = null;
+    private ShellEntity entityInstance;
 
     @Environment(EnvType.CLIENT)
     public ShellEntity asEntity() {
@@ -332,28 +337,28 @@ public class ShellState {
 
     static {
         NBT_SERIALIZER_FACTORY = new NbtSerializerFactoryBuilder<ShellState>()
-            .add(UUID.class, "uuid", x -> x.uuid, (x, uuid) -> x.uuid = uuid)
-            .add(Integer.class, "color", x -> x.color == null ? -1 : x.color.getId(), (x, color) -> x.color = color == -1 ? null : DyeColor.byId(color))
-            .add(Float.class, "progress", x -> x.progress, (x, progress) -> x.progress = progress)
-            .add(Boolean.class, "isArtificial", x -> x.isArtificial, (x, isArtificial) -> x.isArtificial = isArtificial)
+            .add(UUID.class, "uuid", (x, wrapperLookup) -> x.uuid, (x, uuid, wrapperLookup) -> x.uuid = uuid)
+            .add(Integer.class, "color", (x, wrapperLookup) -> x.color == null ? -1 : x.color.getId(), (x, color, wrapperLookup) -> x.color = color == -1 ? null : DyeColor.byId(color))
+            .add(Float.class, "progress", (x, wrapperLookup) -> x.progress, (x, progress, wrapperLookup) -> x.progress = progress)
+            .add(Boolean.class, "isArtificial", (x, wrapperLookup) -> x.isArtificial, (x, isArtificial, wrapperLookup) -> x.isArtificial = isArtificial)
 
-            .add(UUID.class, "ownerUuid", x -> x.ownerUuid, (x, ownerUuid) -> x.ownerUuid = ownerUuid)
-            .add(String.class, "ownerName", x -> x.ownerName, (x, ownerName) -> x.ownerName = ownerName)
-            .add(Float.class, "health", x -> x.health, (x, health) -> x.health = health)
-            .add(Integer.class, "gameMode", x -> x.gameMode, (x, gameMode) -> x.gameMode = gameMode)
-            .add(NbtList.class, "inventory", x -> x.inventory.writeNbt(new NbtList()), (x, inventory) -> { x.inventory = new SimpleInventory(); x.inventory.readNbt(inventory); })
-            .add(NbtCompound.class, "components", x -> x.component.writeNbt(new NbtCompound()), (x, component) -> { x.component = ShellStateComponent.empty(); if (component != null) { x.component.readNbt(component); } })
+            .add(UUID.class, "ownerUuid", (x, wrapperLookup) -> x.ownerUuid, (x, ownerUuid, wrapperLookup) -> x.ownerUuid = ownerUuid)
+            .add(String.class, "ownerName", (x, wrapperLookup) -> x.ownerName, (x, ownerName, wrapperLookup) -> x.ownerName = ownerName)
+            .add(Float.class, "health", (x, wrapperLookup) -> x.health, (x, health, wrapperLookup) -> x.health = health)
+            .add(Integer.class, "gameMode", (x, wrapperLookup) -> x.gameMode, (x, gameMode, wrapperLookup) -> x.gameMode = gameMode)
+            .add(NbtList.class, "inventory", (x, wrapperLookup) -> x.inventory.writeNbt(new NbtList(), wrapperLookup), (x, inventory, wrapperLookup) -> { x.inventory = new SimpleInventory(); x.inventory.readNbt(inventory, wrapperLookup); })
+            .add(NbtCompound.class, "components", (x, wrapperLookup) -> x.component.writeNbt(new NbtCompound(), wrapperLookup), (x, component, wrapperLookup) -> { x.component = ShellStateComponent.empty(); if (component != null) { x.component.readNbt(component, wrapperLookup); } })
 
-            .add(Integer.class, "foodLevel", x -> x.foodLevel, (x, foodLevel) -> x.foodLevel = foodLevel)
-            .add(Float.class, "saturationLevel", x -> x.saturationLevel, (x, saturationLevel) -> x.saturationLevel = saturationLevel)
-            .add(Float.class, "exhaustion", x -> x.exhaustion, (x, exhaustion) -> x.exhaustion = exhaustion)
+            .add(Integer.class, "foodLevel", (x, wrapperLookup) -> x.foodLevel, (x, foodLevel, wrapperLookup) -> x.foodLevel = foodLevel)
+            .add(Float.class, "saturationLevel", (x, wrapperLookup) -> x.saturationLevel, (x, saturationLevel, wrapperLookup) -> x.saturationLevel = saturationLevel)
+            .add(Float.class, "exhaustion", (x, wrapperLookup) -> x.exhaustion, (x, exhaustion, wrapperLookup) -> x.exhaustion = exhaustion)
 
-            .add(Integer.class, "experienceLevel", x -> x.experienceLevel, (x, experienceLevel) -> x.experienceLevel = experienceLevel)
-            .add(Float.class, "experienceProgress", x -> x.experienceProgress, (x, experienceProgress) -> x.experienceProgress = experienceProgress)
-            .add(Integer.class, "totalExperience", x -> x.totalExperience, (x, totalExperience) -> x.totalExperience = totalExperience)
+            .add(Integer.class, "experienceLevel", (x, wrapperLookup) -> x.experienceLevel, (x, experienceLevel, wrapperLookup) -> x.experienceLevel = experienceLevel)
+            .add(Float.class, "experienceProgress", (x, wrapperLookup) -> x.experienceProgress, (x, experienceProgress, wrapperLookup) -> x.experienceProgress = experienceProgress)
+            .add(Integer.class, "totalExperience", (x, wrapperLookup) -> x.totalExperience, (x, totalExperience, wrapperLookup) -> x.totalExperience = totalExperience)
 
-            .add(Identifier.class, "world", x -> x.world, (x, world) -> x.world = world)
-            .add(BlockPos.class, "pos", x -> x.pos, (x, pos) -> x.pos = pos)
+            .add(Identifier.class, "world", (x, wrapperLookup) -> x.world, (x, world, wrapperLookup) -> x.world = world)
+            .add(BlockPos.class, "pos", (x, wrapperLookup) -> x.pos, (x, pos, wrapperLookup) -> x.pos = pos)
             .build();
     }
 }

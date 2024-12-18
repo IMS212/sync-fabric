@@ -153,13 +153,13 @@ public abstract class AbstractShellContainerBlock extends BlockWithEntity {
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (ItemUtil.isWrench(player.getStackInHand(hand))) {
+    public ItemActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (ItemUtil.isWrench(stack)) {
             if (!world.isClient) {
                 world.setBlockState(pos, state.cycle(OUTPUT), 10);
                 world.updateComparators(pos, state.getBlock());
             }
-            return ActionResult.SUCCESS;
+            return ItemActionResult.SUCCESS;
         }
 
         if (!isBottom(state)) {
@@ -169,11 +169,11 @@ public abstract class AbstractShellContainerBlock extends BlockWithEntity {
         if (world.getBlockEntity(pos) instanceof AbstractShellContainerBlockEntity shellContainer) {
             return shellContainer.onUse(world, pos, player, hand);
         }
-        return super.onUse(state, world, pos, player, hand, hit);
+        return super.onUseWithItem(stack, state, world, pos, player, hand, hit);
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
+    public boolean canPathfindThrough(BlockState state, NavigationType type) {
         return false;
     }
 

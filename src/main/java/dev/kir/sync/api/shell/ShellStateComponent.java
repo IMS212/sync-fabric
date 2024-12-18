@@ -2,6 +2,7 @@ package dev.kir.sync.api.shell;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -35,22 +36,22 @@ public abstract class ShellStateComponent {
      * Clones state of the given component.
      * @param component The component.
      */
-    public abstract void clone(ShellStateComponent component);
+    public abstract void clone(ShellStateComponent component, RegistryWrapper.WrapperLookup lookup);
 
     /**
      * Restores state of the component from the nbt data.
      * @param nbt The nbt data.
      */
     @ApiStatus.NonExtendable
-    public void readNbt(NbtCompound nbt) {
-        this.readComponentNbt(nbt.getCompound(this.getId()));
+    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        this.readComponentNbt(nbt.getCompound(this.getId()), lookup);
     }
 
     /**
      * Restores state of the component from the nbt data.
      * @param nbt The nbt data.
      */
-    protected abstract void readComponentNbt(NbtCompound nbt);
+    protected abstract void readComponentNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup);
 
     /**
      * Stores the state of the component to the nbt.
@@ -58,8 +59,8 @@ public abstract class ShellStateComponent {
      * @return The nbt data.
      */
     @ApiStatus.NonExtendable
-    public NbtCompound writeNbt(NbtCompound nbt) {
-        NbtCompound componentNbt = this.writeComponentNbt(new NbtCompound());
+    public NbtCompound writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        NbtCompound componentNbt = this.writeComponentNbt(new NbtCompound(), lookup);
         nbt.put(this.getId(), componentNbt);
         return nbt;
     }
@@ -69,7 +70,7 @@ public abstract class ShellStateComponent {
      * @param nbt The nbt data.
      * @return The nbt data.
      */
-    protected abstract NbtCompound writeComponentNbt(NbtCompound nbt);
+    protected abstract NbtCompound writeComponentNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup);
 
     /**
      * Attempts to cast the component to the given type.
@@ -162,13 +163,13 @@ public abstract class ShellStateComponent {
         }
 
         @Override
-        public void clone(ShellStateComponent component) { }
+        public void clone(ShellStateComponent component, RegistryWrapper.WrapperLookup lookup) { }
 
         @Override
-        public void readNbt(NbtCompound nbt) { }
+        public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) { }
 
         @Override
-        public NbtCompound writeNbt(NbtCompound nbt) {
+        public NbtCompound writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
             return nbt;
         }
 
@@ -178,10 +179,10 @@ public abstract class ShellStateComponent {
         }
 
         @Override
-        protected void readComponentNbt(NbtCompound nbt) { }
+        protected void readComponentNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) { }
 
         @Override
-        protected NbtCompound writeComponentNbt(NbtCompound nbt) {
+        protected NbtCompound writeComponentNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
             return nbt;
         }
     }
@@ -217,9 +218,9 @@ public abstract class ShellStateComponent {
         }
 
         @Override
-        public void clone(ShellStateComponent component) {
+        public void clone(ShellStateComponent component, RegistryWrapper.WrapperLookup lookup) {
             for (ShellStateComponent innerComponent : this.components) {
-                innerComponent.clone(component);
+                innerComponent.clone(component, lookup);
             }
         }
 
@@ -235,25 +236,25 @@ public abstract class ShellStateComponent {
         }
 
         @Override
-        public void readNbt(NbtCompound nbt) {
+        public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
             for (ShellStateComponent component : this.components) {
-                component.readNbt(nbt);
+                component.readNbt(nbt, lookup);
             }
         }
 
         @Override
-        public NbtCompound writeNbt(NbtCompound nbt) {
+        public NbtCompound writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
             for (ShellStateComponent component : this.components) {
-                component.writeNbt(nbt);
+                component.writeNbt(nbt, lookup);
             }
             return nbt;
         }
 
         @Override
-        protected void readComponentNbt(NbtCompound nbt) { }
+        protected void readComponentNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) { }
 
         @Override
-        protected NbtCompound writeComponentNbt(NbtCompound nbt) {
+        protected NbtCompound writeComponentNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
             return nbt;
         }
     }

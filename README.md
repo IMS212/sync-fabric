@@ -151,7 +151,7 @@ You can edit any of these values directly in the config file or via [ModMenu](ht
 
 [![Crowdin](https://badges.crowdin.net/sync-fabric/localized.svg)](https://crowdin.com/project/sync-fabric)
 
-[Sync (Fabric)](https://github.com/Kir-Antipov/sync-fabric) makes use of crowd sourced translations.
+[Sync (Fabric)](https://github.com/Kir-Antipov/sync-fabric) makes use of crowdsourced translations.
 
 You can help translate the mod to additional languages here: [crowdin.com](https://crowdin.com/project/sync-fabric).
 
@@ -166,9 +166,9 @@ You can help translate the mod to additional languages here: [crowdin.com](https
 ## Installation
 
 Requirements:
- - Minecraft `1.19.x`
- - Fabric Loader `>=0.14.0`
- - Fabric API `>=0.55.1`
+ - Minecraft `1.21.x`
+ - Fabric Loader `>=0.16.5`
+ - Fabric API `>=0.105.0`
 
 You can download the mod from:
 
@@ -208,7 +208,7 @@ There's [no documentation](https://www.commitstrip.com/en/2021/11/10/no-document
 ## Building from sources
 
 Requirements:
- - JDK `17`
+ - JDK `21`
 
 ### Linux/MacOS
 

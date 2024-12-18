@@ -2,8 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "pattern": [
     "CSC",
-    "GGG",
-    "CRC"
+    "GIG",
+    "CPC"
   ],
   "key": {
     "C": {
@@ -15,11 +15,14 @@
     "G": {
       "item": "minecraft:glass_pane"
     },
-    "R": {
-      "item": "minecraft:redstone"
+    "I": {
+      "item": "minecraft:iron_block"
+    },
+    "P": {
+      "item": "minecraft:heavy_weighted_pressure_plate"
     }
   },
   "result": {
-    "item": "sync:shell_constructor"
+    "id": "sync:shell_storage"
   }
 }

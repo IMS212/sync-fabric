@@ -1,8 +1,8 @@
 package dev.kir.sync.compat.trinkets;
 
 import dev.emi.trinkets.api.TrinketsApi;
-import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry;
-import dev.onyxstudios.cca.api.v3.entity.EntityComponentInitializer;
+import org.ladysnake.cca.api.v3.entity.EntityComponentFactoryRegistry;
+import org.ladysnake.cca.api.v3.entity.EntityComponentInitializer;
 import dev.kir.sync.api.shell.ShellStateComponentFactoryRegistry;
 import dev.kir.sync.entity.ShellEntity;
 import net.fabricmc.api.EnvType;

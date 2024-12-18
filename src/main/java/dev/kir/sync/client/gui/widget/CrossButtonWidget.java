@@ -7,7 +7,6 @@ import dev.kir.sync.util.math.Radians;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.MathHelper;
@@ -15,7 +14,7 @@ import net.minecraft.util.math.MathHelper;
 @Environment(EnvType.CLIENT)
 public class CrossButtonWidget extends AbstractButtonWidget {
     private static final Text DEFAULT_DESCRIPTION = Text.translatable("gui.sync.default.cross_button.title");
-    private static final int DEFAULT_COLOR = ColorUtil.fromDyeColor(DyeColor.WHITE);
+    private static final int DEFAULT_COLOR = DyeColor.WHITE.getEntityColor();
     private static final float DEFAULT_STEP = Radians.R_PI_32;
 
     private final float step;

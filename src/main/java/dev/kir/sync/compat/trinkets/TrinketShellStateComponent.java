@@ -12,6 +12,8 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.BuiltinRegistries;
+import net.minecraft.registry.RegistryWrapper;
 
 import java.util.*;
 
@@ -57,7 +59,7 @@ class TrinketShellStateComponent extends ShellStateComponent {
     }
 
     @Override
-    public void clone(ShellStateComponent component) {
+    public void clone(ShellStateComponent component, RegistryWrapper.WrapperLookup lookup) {
         this.clear();
         TrinketShellStateComponent trinketComponent = component.as(TrinketShellStateComponent.class);
         if (trinketComponent == null) {
@@ -86,7 +88,7 @@ class TrinketShellStateComponent extends ShellStateComponent {
     }
 
     @Override
-    public NbtCompound writeComponentNbt(NbtCompound nbt) {
+    public NbtCompound writeComponentNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         for (Map.Entry<String, Map<String, Inventory>> group : this.inventory.entrySet()) {
             NbtCompound groupTag = new NbtCompound();
             for (Map.Entry<String, Inventory> slot : group.getValue().entrySet()) {
@@ -94,7 +96,7 @@ class TrinketShellStateComponent extends ShellStateComponent {
                 NbtList list = new NbtList();
                 Inventory inv = slot.getValue();
                 for (int i = 0; i < inv.size(); i++) {
-                    list.add(inv.getStack(i).writeNbt(new NbtCompound()));
+                    list.add(inv.getStack(i).encode(lookup));
                 }
                 slotTag.put("Items", list);
                 groupTag.put(slot.getKey(), slotTag);
@@ -105,7 +107,7 @@ class TrinketShellStateComponent extends ShellStateComponent {
     }
 
     @Override
-    public void readComponentNbt(NbtCompound nbt) {
+    public void readComponentNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         for (String groupKey : nbt.getKeys()) {
             NbtCompound groupTag = nbt.getCompound(groupKey);
             Map<String, Inventory> groupSlots = this.inventory.get(groupKey);
@@ -123,7 +125,7 @@ class TrinketShellStateComponent extends ShellStateComponent {
 
                 int size = Math.min(list.size(), inv.size());
                 for (int i = 0; i < size; i++) {
-                    ItemStack stack = ItemStack.fromNbt(list.getCompound(i));
+                    ItemStack stack = ItemStack.fromNbtOrEmpty(lookup, list.getCompound(i));
                     inv.setStack(i, stack);
                 }
             }

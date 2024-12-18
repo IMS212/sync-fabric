@@ -8,6 +8,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
+import net.minecraft.client.util.BufferAllocator;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.RotationAxis;
@@ -45,8 +46,8 @@ public final class RenderSystemUtil {
             double x1 = minorR * cos + cX;
             double y1 = minorR * sin + cY;
 
-            consumer.vertex(matrix, (float)x0, (float)y0, 0).color(r, g, b, a).next();
-            consumer.vertex(matrix, (float)x1, (float)y1, 0).color(r, g, b, a).next();
+            consumer.vertex(matrix, (float)x0, (float)y0, 0).color(r, g, b, a);
+            consumer.vertex(matrix, (float)x1, (float)y1, 0).color(r, g, b, a);
         }
     }
 
@@ -67,9 +68,9 @@ public final class RenderSystemUtil {
         drawQuadrant(matrix, consumer, x + borderRadius, y + borderRadius, borderRadius, 2, step, r, g, b, a);
         drawQuadrant(matrix, consumer, x + width - borderRadius, y + borderRadius, borderRadius, 3, step, r, g, b, a);
 
-        consumer.vertex(matrix, x + width, y + height - borderRadius, 0).color(r, g, b, a).next();
-        consumer.vertex(matrix, x + borderRadius, y + borderRadius, 0).color(r, g, b, a).next();
-        consumer.vertex(matrix, x + borderRadius, y + height - borderRadius, 0).color(r, g, b, a).next();
+        consumer.vertex(matrix, x + width, y + height - borderRadius, 0).color(r, g, b, a);
+        consumer.vertex(matrix, x + borderRadius, y + borderRadius, 0).color(r, g, b, a);
+        consumer.vertex(matrix, x + borderRadius, y + height - borderRadius, 0).color(r, g, b, a);
 
         matrices.pop();
     }
@@ -80,13 +81,13 @@ public final class RenderSystemUtil {
         for (float i = start; i < end; i += step) {
             float x = radius * (float)Math.cos(i) + cX;
             float y = radius * (float)Math.sin(i) + cY;
-            consumer.vertex(matrix, x, y, 0).color(r, g, b, a).next();
-            consumer.vertex(matrix, cX, cY, 0).color(r, g, b, a).next();
+            consumer.vertex(matrix, x, y, 0).color(r, g, b, a);
+            consumer.vertex(matrix, cX, cY, 0).color(r, g, b, a);
         }
         float x = radius * (float)Math.cos(end) + cX;
         float y = radius * (float)Math.sin(end) + cY;
-        consumer.vertex(matrix, x, y, 0).color(r, g, b, a).next();
-        consumer.vertex(matrix, cX, cY, 0).color(r, g, b, a).next();
+        consumer.vertex(matrix, x, y, 0).color(r, g, b, a);
+        consumer.vertex(matrix, cX, cY, 0).color(r, g, b, a);
     }
 
     public static void draw(Consumer<VertexConsumer> consumer, VertexFormat.DrawMode drawMode, VertexFormat format) {
@@ -94,8 +95,7 @@ public final class RenderSystemUtil {
         RenderSystem.defaultBlendFunc();
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 
-        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-        bufferBuilder.begin(drawMode, format);
+        BufferBuilder bufferBuilder = Tessellator.getInstance().begin(drawMode, format);
         consumer.accept(bufferBuilder);
         BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 
@@ -123,7 +123,8 @@ public final class RenderSystemUtil {
     }
 
     public static void drawCenteredText(DrawContext drawContext, Text text, TextRenderer textRenderer, float cX, float cY, float scale, int color, boolean shadow) {
-        VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
+        //TODO verify if this actually works
+        VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(new BufferAllocator(text.toString().length()));
         drawCenteredText(drawContext, text, immediate, textRenderer, cX, cY, scale, color, shadow);
         immediate.draw();
     }

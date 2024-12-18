@@ -3,16 +3,12 @@ package dev.kir.sync.compat.origins;
 import dev.kir.sync.api.shell.ShellStateComponent;
 import io.github.apace100.apoli.component.PowerHolderComponent;
 import io.github.apace100.origins.component.OriginComponent;
-import io.github.apace100.origins.networking.ModPackets;
-import io.github.apace100.origins.origin.Origin;
-import io.github.apace100.origins.origin.OriginLayer;
-import io.github.apace100.origins.origin.OriginLayers;
+import io.github.apace100.origins.networking.packet.s2c.OpenChooseOriginScreenS2CPacket;
 import io.github.apace100.origins.registry.ModComponents;
-import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 class OriginsShellStateComponent extends ShellStateComponent {
@@ -43,33 +39,33 @@ class OriginsShellStateComponent extends ShellStateComponent {
         return this.activated;
     }
 
-    public NbtCompound getOriginComponentNbt() {
+    public NbtCompound getOriginComponentNbt(RegistryWrapper.WrapperLookup lookup) {
         NbtCompound nbt = this.originComponentNbt;
         if (this.player != null) {
             nbt = new NbtCompound();
-            ModComponents.ORIGIN.get(this.player).writeToNbt(nbt);
+            ModComponents.ORIGIN.get(this.player).writeToNbt(nbt, lookup);
         }
         return nbt == null ? new NbtCompound() : nbt;
     }
 
-    public NbtCompound getPowerHolderComponentNbt() {
+    public NbtCompound getPowerHolderComponentNbt(RegistryWrapper.WrapperLookup lookup) {
         NbtCompound nbt = this.powerHolderComponentNbt;
         if (this.player != null) {
             nbt = new NbtCompound();
-            PowerHolderComponent.KEY.get(this.player).writeToNbt(nbt);
+            PowerHolderComponent.KEY.get(this.player).writeToNbt(nbt, lookup);
         }
         return nbt == null ? new NbtCompound() : nbt;
     }
 
     @Override
-    public void clone(ShellStateComponent component) {
+    public void clone(ShellStateComponent component, RegistryWrapper.WrapperLookup lookup) {
         OriginsShellStateComponent other = component.as(OriginsShellStateComponent.class);
         if (other == null) {
             return;
         }
 
-        this.originComponentNbt = other.getOriginComponentNbt();
-        this.powerHolderComponentNbt = other.getPowerHolderComponentNbt();
+        this.originComponentNbt = other.getOriginComponentNbt(lookup);
+        this.powerHolderComponentNbt = other.getPowerHolderComponentNbt(lookup);
         this.activated = other.isActivated();
         if (this.player == null) {
             return;
@@ -77,36 +73,27 @@ class OriginsShellStateComponent extends ShellStateComponent {
 
         OriginComponent originComponent = ModComponents.ORIGIN.get(this.player);
         if (this.activated) {
-            originComponent.readFromNbt(this.originComponentNbt);
+            originComponent.readFromNbt(this.originComponentNbt, lookup);
             PowerHolderComponent powerHolderComponent = PowerHolderComponent.KEY.get(this.player);
-            powerHolderComponent.readFromNbt(this.powerHolderComponentNbt);
+            powerHolderComponent.readFromNbt(this.powerHolderComponentNbt, lookup);
             originComponent.sync();
         } else {
-            for (OriginLayer layer : OriginLayers.getLayers()) {
-                if (layer.isEnabled()) {
-                    originComponent.setOrigin(layer, Origin.EMPTY);
-                }
-            }
-            originComponent.checkAutoChoosingLayers(this.player, false);
-            originComponent.sync();
-            PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
-            data.writeBoolean(false);
-            ServerPlayNetworking.send(this.player, ModPackets.OPEN_ORIGIN_SCREEN, data);
+            ServerPlayNetworking.send(this.player, new OpenChooseOriginScreenS2CPacket(false));
             this.activated = true;
         }
     }
 
     @Override
-    protected void readComponentNbt(NbtCompound nbt) {
+    protected void readComponentNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         this.originComponentNbt = nbt.contains("origins", NbtElement.COMPOUND_TYPE) ? nbt.getCompound("origins") : new NbtCompound();
         this.powerHolderComponentNbt = nbt.contains("powers", NbtElement.COMPOUND_TYPE) ? nbt.getCompound("powers") : new NbtCompound();
         this.activated = nbt.getBoolean("activated");
     }
 
     @Override
-    protected NbtCompound writeComponentNbt(NbtCompound nbt) {
-        nbt.put("origins", this.getOriginComponentNbt());
-        nbt.put("powers", this.getPowerHolderComponentNbt());
+    protected NbtCompound writeComponentNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        nbt.put("origins", this.getOriginComponentNbt(lookup));
+        nbt.put("powers", this.getPowerHolderComponentNbt(lookup));
         nbt.putBoolean("activated", this.isActivated());
         return nbt;
     }

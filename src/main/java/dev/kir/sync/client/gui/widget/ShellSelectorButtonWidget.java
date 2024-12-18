@@ -158,11 +158,11 @@ public class ShellSelectorButtonWidget extends AbstractWidget {
         float alpha = this.isPressed() ? this.pressedAlpha : this.isHovered() ? this.hoveredAlpha : this.alpha;
         DyeColor borderColor = this.shell == null ? null : this.shell.getColor();
         DyeColor color = borderColor != null && (this.isHovered() || this.isPressed()) ? borderColor : this.color;
-        float[] rgb = color.getColorComponents();
+        float[] rgb = ColorUtil.toRGBA(color.getEntityColor());
         RenderSystemUtil.drawAnnulusSector(matrices, this.cX, this.cY, this.majorR, this.minorR, this.from, this.to, this.step, rgb[0], rgb[1], rgb[2], alpha);
 
         if (borderColor != null) {
-            rgb = borderColor.getColorComponents();
+            rgb = ColorUtil.toRGBA(borderColor.getEntityColor());
             RenderSystemUtil.drawAnnulusSector(matrices, this.cX, this.cY, this.majorR, this.minorRBorder, this.from, this.to, this.step, rgb[0], rgb[1], rgb[2], 1F);
         }
     }
@@ -234,7 +234,7 @@ public class ShellSelectorButtonWidget extends AbstractWidget {
         matrices.push();
         matrices.translate(0, 0, this.majorR * 2);
         RenderSystemUtil.drawRectangle(matrices, boxLeft, boxTop, progressBoxWidth, boxHeight, boxHeight * 0.25F, 1F, 0, (float)this.step, 0F, 0F, 0F, 0.8F);
-        RenderSystemUtil.drawCenteredText(drawContext, progressText, shellCX, shellCY, fontScale, ColorUtil.fromDyeColor(DyeColor.WHITE), true);
+        RenderSystemUtil.drawCenteredText(drawContext, progressText, shellCX, shellCY, fontScale, DyeColor.WHITE.getEntityColor(), true);
         matrices.pop();
     }
 

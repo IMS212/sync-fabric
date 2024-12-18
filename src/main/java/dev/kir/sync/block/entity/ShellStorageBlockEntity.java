@@ -22,6 +22,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Hand;
+import net.minecraft.util.ItemActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -114,9 +115,9 @@ public class ShellStorageBlockEntity extends AbstractShellContainerBlockEntity i
     }
 
     @Override
-    public ActionResult onUse(World world, BlockPos pos, PlayerEntity player, Hand hand) {
+    public ItemActionResult onUse(World world, BlockPos pos, PlayerEntity player, Hand hand) {
         if (world.isClient) {
-            return ActionResult.SUCCESS;
+            return ItemActionResult.SUCCESS;
         }
 
         ItemStack stack = player.getStackInHand(hand);
@@ -125,7 +126,7 @@ public class ShellStorageBlockEntity extends AbstractShellContainerBlockEntity i
             stack.decrement(1);
             this.color = dye.getColor();
         }
-        return ActionResult.SUCCESS;
+        return ItemActionResult.SUCCESS;
     }
 
     @Override

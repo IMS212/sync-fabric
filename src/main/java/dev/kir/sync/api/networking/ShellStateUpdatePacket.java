@@ -6,21 +6,23 @@ import dev.kir.sync.api.shell.ShellState;
 import dev.kir.sync.api.shell.ShellStateUpdateType;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtSizeTracker;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.DyeColor;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 
 import java.util.UUID;
 
-public class ShellStateUpdatePacket implements ClientPlayerPacket {
+public class ShellStateUpdatePacket implements CustomPayload {
+    public static final PacketCodec<RegistryByteBuf, ShellStateUpdatePacket> CODEC = PacketCodec.of(ShellStateUpdatePacket::write, ShellStateUpdatePacket::new);
+    public static final CustomPayload.Id<ShellStateUpdatePacket> ID = new CustomPayload.Id<>(Sync.locate("packet.shell.state.update"));
     private ShellStateUpdateType type;
     private ShellState shellState;
     private UUID uuid;
@@ -33,13 +35,15 @@ public class ShellStateUpdatePacket implements ClientPlayerPacket {
         this.shellState = shellState;
     }
 
-    @Override
-    public Identifier getId() {
-        return Sync.locate("packet.shell.state.update");
+    public ShellStateUpdatePacket(RegistryByteBuf byteBuf) {
+        read(byteBuf, byteBuf.getRegistryManager());
     }
 
-    @Override
-    public void write(PacketByteBuf buffer) {
+    public Id<? extends CustomPayload> getId() {
+        return ID;
+    }
+
+    public void write(RegistryByteBuf buffer) {
         if (this.shellState == null && this.type != ShellStateUpdateType.NONE) {
             throw new IllegalStateException();
         }
@@ -47,7 +51,7 @@ public class ShellStateUpdatePacket implements ClientPlayerPacket {
         buffer.writeEnumConstant(type);
         switch (type) {
             case ADD:
-                buffer.writeNbt(this.shellState.writeNbt(new NbtCompound()));
+                buffer.writeNbt(this.shellState.writeNbt(new NbtCompound(), buffer.getRegistryManager()));
                 break;
 
             case REMOVE:
@@ -66,12 +70,11 @@ public class ShellStateUpdatePacket implements ClientPlayerPacket {
         }
     }
 
-    @Override
-    public void read(PacketByteBuf buffer) {
+    public void read(PacketByteBuf buffer, RegistryWrapper.WrapperLookup lookup) {
         this.type = buffer.readEnumConstant(ShellStateUpdateType.class);
         switch (this.type) {
             case ADD:
-                this.shellState = ShellState.fromNbt((NbtCompound) buffer.readNbt(NbtSizeTracker.ofUnlimitedBytes()));
+                this.shellState = ShellState.fromNbt((NbtCompound) buffer.readNbt(NbtSizeTracker.ofUnlimitedBytes()), lookup);
                 break;
 
             case REMOVE:
@@ -91,9 +94,8 @@ public class ShellStateUpdatePacket implements ClientPlayerPacket {
         }
     }
 
-    @Override
     @Environment(EnvType.CLIENT)
-    public void execute(MinecraftClient client, ClientPlayerEntity player, ClientPlayNetworkHandler handler, PacketSender responseSender) {
+    public void execute(ClientPlayerEntity player) {
         Shell shell = (Shell)player;
         if (shell == null) {
             return;

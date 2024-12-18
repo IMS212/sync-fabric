@@ -2,6 +2,7 @@ package dev.kir.sync.api.shell;
 
 import com.mojang.datafixers.util.Either;
 import dev.kir.sync.api.event.PlayerSyncEvents;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.MinecraftServer;
 
 import java.util.Optional;
@@ -22,14 +23,14 @@ public interface ServerShell extends Shell {
      * @param state Target state.
      * @return New state that was generated during the sync process, if it was successful; otherwise, failure reason is returned.
      */
-    Either<ShellState, PlayerSyncEvents.SyncFailureReason> sync(ShellState state);
+    Either<ShellState, PlayerSyncEvents.SyncFailureReason> sync(ShellState state, RegistryWrapper.WrapperLookup lookup);
 
     /**
      * Modifies the internal state of the shell to match the specified one.
      *
      * @param state Target state.
      */
-    void apply(ShellState state);
+    void apply(ShellState state, RegistryWrapper.WrapperLookup lookup);
 
 
     /**

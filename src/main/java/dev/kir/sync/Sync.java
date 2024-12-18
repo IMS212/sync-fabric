@@ -3,6 +3,7 @@ package dev.kir.sync;
 import dev.kir.sync.block.SyncBlocks;
 import dev.kir.sync.block.entity.SyncBlockEntities;
 import dev.kir.sync.client.render.CustomGameRenderer;
+import dev.kir.sync.client.render.MatrixStackStorage;
 import dev.kir.sync.client.render.SyncRenderers;
 import dev.kir.sync.command.SyncCommands;
 import dev.kir.sync.config.SyncConfig;
@@ -13,6 +14,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
@@ -23,7 +25,7 @@ public class Sync implements ModInitializer, ClientModInitializer {
     private static final SyncConfig CONFIG = SyncConfig.resolve();
 
     public static Identifier locate(String location) {
-        return new Identifier(MOD_ID, location);
+        return Identifier.of(MOD_ID, location);
     }
 
     public static SyncConfig getConfig() {
@@ -37,7 +39,7 @@ public class Sync implements ModInitializer, ClientModInitializer {
         SyncItems.init();
         SyncPackets.init();
         SyncCommands.init();
-        Registry.register(Registries.ITEM_GROUP, new Identifier("sync", "sync"), SyncItemGroups.MAIN);
+        Registry.register(Registries.ITEM_GROUP, Identifier.of("sync", "sync"), SyncItemGroups.MAIN);
     }
 
     @Override
